@@ -29,6 +29,8 @@ class VerificationService
         $this->appKey = $_ENV['JWT_SECRET'] ?? 'kj498nioqfj90308h4io398hfoinih398uh3nf';
     }
 
+
+    
     /**
      * Send verification email to user
      *
