@@ -59,6 +59,6 @@ class CreateAdminUser extends AbstractSeed
         }
 
         echo "✅ Admin user created successfully!\n";
-        echo "   Email: admin@eventic.com\n";
+   
     }
 }
