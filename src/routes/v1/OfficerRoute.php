@@ -21,6 +21,8 @@ return function (App $app): void {
     
     $app->group('/v1/officer', function (RouteCollectorProxy $group) use ($officerDashboardController, $issueController) {
         
+        $group->get('/dashboard/stats', [$officerDashboardController, 'getStats']);
+
         $group->group('/reports', function (RouteCollectorProxy $reportsGroup) use ($officerDashboardController) {
             $reportsGroup->get('/summary', [$officerDashboardController, 'getSummary']);
             $reportsGroup->get('/breakdown', [$officerDashboardController, 'getBreakdown']);

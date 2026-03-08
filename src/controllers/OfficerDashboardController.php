@@ -84,9 +84,19 @@ class OfficerDashboardController
                 ];
             })->values()->toArray();
 
+            // Priority Breakdown
+            $priorityBreakdownRaw = Issue::select('priority', DB::raw('count(*) as total'))
+                ->groupBy('priority')
+                ->get();
+            
+            $issuesByPriority = $priorityBreakdownRaw->mapWithKeys(function ($item) {
+                return [$item->priority => $item->total];
+            })->toArray();
+
             return ResponseHelper::success($response, 'Breakdown fetched', [
                 'issues_by_category' => $issuesByCategory,
                 'issues_by_location' => $issuesByLocation,
+                'issues_by_priority' => $issuesByPriority,
                 'total' => $totalIssues, // ensure not 0
             ]);
         } catch (Exception $e) {
@@ -327,6 +337,51 @@ class OfficerDashboardController
             ]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch issues', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get dashboard stats for officer
+     * GET /v1/officer/dashboard/stats
+     */
+    public function getStats(Request $request, Response $response): Response
+    {
+        try {
+            $user = $request->getAttribute('user');
+            
+            // Total issues (based on what they can see, e.g. all or assigned)
+            $totalIssues = Issue::count();
+            $pendingIssues = Issue::whereIn('status', [Issue::STATUS_SUBMITTED, 'under_officer_review'])->count();
+            $inProgressIssues = Issue::whereIn('status', [
+                Issue::STATUS_ASSESSMENT_IN_PROGRESS, 
+                Issue::STATUS_RESOLUTION_IN_PROGRESS,
+                'forwarded_to_admin',
+                'assigned_to_task_force'
+            ])->count();
+            $resolvedIssues = Issue::where('status', Issue::STATUS_RESOLVED)->count();
+            
+            // Basic performance / team aggregates
+            $activeAgents = User::where('role', User::ROLE_AGENT)->where('status', User::STATUS_ACTIVE)->count();
+            $totalAgents = User::where('role', User::ROLE_AGENT)->count();
+
+            return ResponseHelper::success($response, 'Dashboard stats fetched successfully', [
+                'my_issues' => [
+                    'total' => $totalIssues,
+                    'pending_review' => $pendingIssues,
+                    'in_progress' => $inProgressIssues,
+                    'resolved' => $resolvedIssues,
+                ],
+                'performance' => [
+                    'average_review_time_hours' => 24, // mocked for now
+                    'issues_reviewed_this_month' => 15, // mocked for now
+                ],
+                'team' => [
+                    'total_agents' => $totalAgents,
+                    'active_agents' => $activeAgents,
+                ]
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch dashboard stats', 500, $e->getMessage());
         }
     }
 }
