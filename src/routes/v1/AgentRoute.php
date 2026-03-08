@@ -30,7 +30,7 @@ return function (App $app): void {
         
         // Issue Management for Agents
         $group->post('/issues', [$issueController, 'create']);
-        $group->get('/issues/{id}', [$issueController, 'show']);
+        $group->get('/issues/{id}', [$agentController, 'getIssueDetail']);
         $group->put('/issues/{id}', [$issueController, 'update']);
         $group->delete('/issues/{id}', [$issueController, 'delete']);
         

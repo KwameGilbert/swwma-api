@@ -24,7 +24,9 @@ class Issue extends Model
         'community_id',
         'suburb_id',
         'specific_location',
-        'details',
+        'issue_type',
+        'people_affected',
+        'estimated_budget',
         'status',
         'priority',
         'images',
@@ -36,7 +38,9 @@ class Issue extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'images' => 'array'
+        'images' => 'array',
+        'people_affected' => 'integer',
+        'estimated_budget' => 'float'
     ];
 
     /**

@@ -72,9 +72,12 @@ class AgentDashboardController
                     'title' => $issue->title,
                     'description' => $issue->description,
                     'category' => $issue->category_name,
-                    'location' => $issue->location_display,
+                    'community' => $issue->community->name ?? 'Unknown',
+                    'suburb' => $issue->suburb->name ?? null,
+                    'specific_location' => $issue->specific_location,
                     'status' => $issue->status,
                     'priority' => $issue->priority,
+                    'issue_type' => $issue->issue_type,
                     'images' => $issue->images ?? [],
                     'reporter_name' => $issue->constituent->name ?? null,
                     'reporter_phone' => $issue->constituent->phone_number ?? null,
@@ -89,6 +92,63 @@ class AgentDashboardController
             ]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch agent reports', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get details for a specific issue (mapped for agent dashboard)
+     * GET /v1/agent/issues/{id}
+     */
+    public function getIssueDetail(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $agent = $request->getAttribute('user');
+            $issue = Issue::with(['category', 'sector', 'subsector', 'community', 'suburb', 'constituent', 'officer.officerProfile'])
+                ->where('id', $args['id'])
+                ->where('agent_id', $agent->id)
+                ->first();
+
+            if (!$issue) {
+                return ResponseHelper::error($response, 'Issue not found or unauthorized', 404);
+            }
+
+            $mappedIssue = [
+                'id' => $issue->id,
+                'case_id' => 'ISS-' . str_pad((string)$issue->id, 5, '0', STR_PAD_LEFT),
+                'title' => $issue->title,
+                'description' => $issue->description,
+                'category' => $issue->category_name,
+                'issue_type' => $issue->issue_type,
+                'priority' => $issue->priority,
+                'status' => $issue->status,
+                'community' => $issue->community->name ?? 'Unknown',
+                'suburb' => $issue->suburb->name ?? null,
+                'specific_location' => $issue->specific_location,
+                'sector' => $issue->sector->name ?? null,
+                'subsector' => $issue->subsector->name ?? null,
+                'people_affected' => $issue->people_affected,
+                'estimated_budget' => $issue->estimated_budget,
+                'additional_notes' => $issue->details, // Also mapping details here just in case
+                'reporter_name' => $issue->constituent->name ?? null,
+                'reporter_phone' => $issue->constituent->phone_number ?? null,
+                'reporter_email' => $issue->constituent->email ?? null,
+                'reporter_gender' => $issue->constituent->gender ?? null,
+                'reporter_address' => $issue->constituent->home_address ?? null,
+                'images' => $issue->images ?? [],
+                'assigned_officer' => $issue->officer ? [
+                    'id' => $issue->officer->id,
+                    'user' => [
+                        'name' => $issue->officer->getFullName(),
+                        'email' => $issue->officer->email
+                    ]
+                ] : null,
+                'created_at' => $issue->created_at->toIso8601String(),
+                'updated_at' => $issue->updated_at ? $issue->updated_at->toIso8601String() : null,
+            ];
+
+            return ResponseHelper::success($response, 'Issue detail fetched', ['issue' => $mappedIssue]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch issue details', 500, $e->getMessage());
         }
     }
 
