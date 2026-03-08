@@ -329,8 +329,29 @@ class OfficerDashboardController
             $total = (clone $query)->count();
             $issues = $query->latest()->skip($offset)->take($limit)->get();
 
+            $reports = $issues->map(function ($issue) {
+                return [
+                    'id' => $issue->id,
+                    'case_id' => 'ISS-' . str_pad((string)$issue->id, 5, '0', STR_PAD_LEFT),
+                    'title' => $issue->title,
+                    'description' => $issue->description,
+                    'category' => $issue->category_name,
+                    'community' => $issue->community->name ?? 'Unknown',
+                    'suburb' => $issue->suburb->name ?? null,
+                    'specific_location' => $issue->specific_location,
+                    'status' => $issue->status,
+                    'priority' => $issue->priority,
+                    'issue_type' => $issue->issue_type,
+                    'images' => $issue->images ?? [],
+                    'reporter_name' => $issue->constituent->name ?? null,
+                    'reporter_phone' => $issue->constituent->phone_number ?? null,
+                    'created_at' => $issue->created_at ? $issue->created_at->toIso8601String() : null,
+                    'updated_at' => $issue->updated_at ? $issue->updated_at->toIso8601String() : null,
+                ];
+            });
+
             return ResponseHelper::success($response, 'Issues fetched successfully', [
-                'reports' => $issues->toArray(),
+                'reports' => $reports,
                 'total' => $total,
                 'page' => $page,
                 'limit' => $limit
