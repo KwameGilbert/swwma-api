@@ -405,4 +405,73 @@ class OfficerDashboardController
             return ResponseHelper::error($response, 'Failed to fetch dashboard stats', 500, $e->getMessage());
         }
     }
+    /**
+     * Get details for a specific issue
+     * GET /v1/officer/issues/{id}
+     */
+    public function getIssueDetail(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $issue = Issue::with([
+                'constituent', 
+                'category', 
+                'sector', 
+                'subsector', 
+                'community', 
+                'suburb',
+                'agent.agentProfile',
+                'officer.officerProfile'
+            ])->find($args['id']);
+
+            if (!$issue) {
+                return ResponseHelper::error($response, 'Issue not found', 404);
+            }
+
+            $mappedIssue = [
+                'id' => $issue->id,
+                'case_id' => 'ISS-' . str_pad((string)$issue->id, 5, '0', STR_PAD_LEFT),
+                'title' => $issue->title,
+                'description' => $issue->description,
+                'category' => $issue->category_name,
+                'community' => $issue->community->name ?? 'Unknown',
+                'suburb' => $issue->suburb->name ?? null,
+                'specific_location' => $issue->specific_location,
+                'status' => $issue->status,
+                'priority' => $issue->priority,
+                'issue_type' => $issue->issue_type,
+                'sector' => $issue->sector->name ?? null,
+                'subsector' => $issue->subsector->name ?? null,
+                'people_affected' => $issue->people_affected,
+                'estimated_budget' => $issue->estimated_budget,
+                'additional_notes' => $issue->details,
+                'images' => $issue->images ?? [],
+                'reporter_name' => $issue->constituent->name ?? null,
+                'reporter_phone' => $issue->constituent->phone_number ?? null,
+                'reporter_email' => $issue->constituent->email ?? null,
+                'reporter_gender' => $issue->constituent->gender ?? null,
+                'reporter_address' => $issue->constituent->home_address ?? null,
+                'created_at' => $issue->created_at ? $issue->created_at->toIso8601String() : null,
+                'updated_at' => $issue->updated_at ? $issue->updated_at->toIso8601String() : null,
+                'agent' => $issue->agent ? [
+                    'id' => $issue->agent->id,
+                    'name' => $issue->agent->getFullName(),
+                    'email' => $issue->agent->email,
+                    'phone' => $issue->agent->phone,
+                ] : null,
+                'assigned_officer' => $issue->officer ? [
+                    'id' => $issue->officer->id,
+                    'user' => [
+                        'name' => $issue->officer->getFullName(),
+                        'email' => $issue->officer->email
+                    ]
+                ] : null,
+            ];
+
+            return ResponseHelper::success($response, 'Issue detail fetched', [
+                'report' => $mappedIssue
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch issue details', 500, $e->getMessage());
+        }
+    }
 }

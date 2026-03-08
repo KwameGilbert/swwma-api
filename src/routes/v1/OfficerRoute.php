@@ -36,7 +36,7 @@ return function (App $app): void {
         // Issues Management for Officers
         $group->get('/issues', [$officerDashboardController, 'getOfficerIssues']);
         $group->post('/issues', [$issueController, 'create']);
-        $group->get('/issues/{id}', [$issueController, 'show']);
+        $group->get('/issues/{id}', [$officerDashboardController, 'getIssueDetail']);
         $group->put('/issues/{id}', [$issueController, 'update']);
         $group->delete('/issues/{id}', [$issueController, 'delete']);
 

@@ -176,7 +176,9 @@ class IssueController
                 $issue->toArray()
             );
 
-            return ResponseHelper::success($response, 'Issue reported successfully', $issue->load('constituent')->toArray(), 201);
+            return ResponseHelper::success($response, 'Issue reported successfully', [
+                'report' => $issue->load('constituent')->toArray()
+            ], 201);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to report issue', 500, $e->getMessage());
         }
@@ -215,7 +217,9 @@ class IssueController
                 $issue->toArray()
             );
 
-            return ResponseHelper::success($response, 'Issue updated successfully', $issue->toArray());
+            return ResponseHelper::success($response, 'Issue updated successfully', [
+                'report' => $issue->toArray()
+            ]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update issue', 500, $e->getMessage());
         }
