@@ -25,8 +25,10 @@ return function (App $app): void {
         
         $group->get('/stats', [$agentController, 'getStats']);
         $group->get('/my-reports', [$agentController, 'getMyReports']);
-        $group->get('/profile', [$authController, 'me']);
+        $group->get('/profile', [$agentController, 'getProfile']);
         $group->put('/profile', [$agentController, 'updateProfile']);
+        $group->post('/profile/image', [$agentController, 'uploadProfileImage']);
+        $group->put('/password', [$authController, 'changePassword']);
         
         // Issue Management for Agents
         $group->post('/issues', [$issueController, 'create']);

@@ -31,7 +31,7 @@ class SectorController
             }
 
             $sectors = $query->get();
-            return ResponseHelper::success($response, 'Sectors fetched successfully', $sectors->toArray());
+            return ResponseHelper::success($response, 'Sectors fetched successfully', ['sectors' => $sectors->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch sectors', 500, $e->getMessage());
         }
@@ -44,7 +44,7 @@ class SectorController
             if (!$sector) {
                 return ResponseHelper::error($response, 'Sector not found', 404);
             }
-            return ResponseHelper::success($response, 'Sector fetched successfully', $sector->toArray());
+            return ResponseHelper::success($response, 'Sector fetched successfully', ['sector' => $sector->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch sector', 500, $e->getMessage());
         }
@@ -91,7 +91,7 @@ class SectorController
                 $sector->toArray()
             );
 
-            return ResponseHelper::success($response, 'Sector updated successfully', $sector->toArray());
+            return ResponseHelper::success($response, 'Sector updated successfully', ['sector' => $sector->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update sector', 500, $e->getMessage());
         }

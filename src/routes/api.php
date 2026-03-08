@@ -35,6 +35,7 @@ return function ($app): void {
         '/v1/job-applicants' => ROUTE . 'v1/EmploymentRoute.php',
         '/v1/employment' => ROUTE . 'v1/EmploymentRoute.php',
         '/v1/agent' => ROUTE . 'v1/AgentRoute.php',
+        '/v1/officer' => ROUTE . 'v1/OfficerRoute.php',
 
         // System
         '/v1/utils' => ROUTE . 'v1/UtilsRoute.php',

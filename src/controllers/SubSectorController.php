@@ -31,7 +31,7 @@ class SubSectorController
             }
 
             $subsectors = $query->get();
-            return ResponseHelper::success($response, 'Sub-sectors fetched successfully', $subsectors->toArray());
+            return ResponseHelper::success($response, 'Sub-sectors fetched successfully', ['sub_sectors' => $subsectors->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch sub-sectors', 500, $e->getMessage());
         }
@@ -44,7 +44,7 @@ class SubSectorController
             if (!$subsector) {
                 return ResponseHelper::error($response, 'Sub-sector not found', 404);
             }
-            return ResponseHelper::success($response, 'Sub-sector fetched successfully', $subsector->toArray());
+            return ResponseHelper::success($response, 'Sub-sector fetched successfully', ['sub_sector' => $subsector->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch sub-sector', 500, $e->getMessage());
         }
@@ -91,7 +91,7 @@ class SubSectorController
                 $subsector->toArray()
             );
 
-            return ResponseHelper::success($response, 'Sub-sector updated successfully', $subsector->toArray());
+            return ResponseHelper::success($response, 'Sub-sector updated successfully', ['sub_sector' => $subsector->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update sub-sector', 500, $e->getMessage());
         }

@@ -24,7 +24,7 @@ class CategoryController
     {
         try {
             $categories = Category::with('sectors.subsectors')->get();
-            return ResponseHelper::success($response, 'Categories fetched successfully', $categories->toArray());
+            return ResponseHelper::success($response, 'Categories fetched successfully', ['categories' => $categories->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch categories', 500, $e->getMessage());
         }
@@ -37,7 +37,7 @@ class CategoryController
             if (!$category) {
                 return ResponseHelper::error($response, 'Category not found', 404);
             }
-            return ResponseHelper::success($response, 'Category fetched successfully', $category->toArray());
+            return ResponseHelper::success($response, 'Category fetched successfully', ['category' => $category->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch category', 500, $e->getMessage());
         }
@@ -84,7 +84,7 @@ class CategoryController
                 $category->toArray()
             );
 
-            return ResponseHelper::success($response, 'Category updated successfully', $category->toArray());
+            return ResponseHelper::success($response, 'Category updated successfully', ['category' => $category->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update category', 500, $e->getMessage());
         }

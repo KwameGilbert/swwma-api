@@ -10,6 +10,8 @@ use App\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Exception;
+use Psr\Http\Message\UploadedFileInterface;
+use Respect\Validation\Validator as v;
 
 /**
  * AgentDashboardController
@@ -153,6 +155,42 @@ class AgentDashboardController
     }
 
     /**
+     * Get the authenticated agent's profile
+     * GET /v1/agent/profile
+     */
+    public function getProfile(Request $request, Response $response): Response
+    {
+        try {
+            $user = $request->getAttribute('user');
+            $userModel = User::with('agentProfile')->find($user->id);
+
+            if (!$userModel) {
+                return ResponseHelper::error($response, 'User not found', 404);
+            }
+
+            $profile = $userModel->agentProfile;
+            
+            // Map to standardized format
+            $mappedAgent = $profile->toArray();
+            $mappedAgent['user'] = [
+                'id' => $userModel->id,
+                'name' => $userModel->getFullName(),
+                'email' => $userModel->email,
+                'phone' => $userModel->phone,
+                'role' => $userModel->role,
+                'status' => $userModel->status,
+            ];
+
+            $mappedAgent['reports_submitted'] = Issue::where('agent_id', $userModel->id)->count();
+            $mappedAgent['last_active_at'] = $userModel->updated_at->toIso8601String();
+
+            return ResponseHelper::success($response, 'Profile fetched successfully', ['agent' => $mappedAgent]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch profile', 500, $e->getMessage());
+        }
+    }
+
+    /**
      * Update the authenticated agent's profile
      * PUT /v1/agent/profile
      */
@@ -160,22 +198,28 @@ class AgentDashboardController
     {
         try {
             $user = $request->getAttribute('user');
+            $userModel = User::find($user->id);
             $data = $request->getParsedBody();
 
             // 1. Update User Record
-            if (isset($data['email']) && $data['email'] !== $user->email) {
-                if (User::where('email', $data['email'])->where('id', '!=', $user->id)->exists()) {
+            if (isset($data['email']) && $data['email'] !== $userModel->email) {
+                if (User::where('email', $data['email'])->where('id', '!=', $userModel->id)->exists()) {
                     return ResponseHelper::error($response, 'Email already in use', 409);
                 }
-                $user->email = $data['email'];
+                $userModel->email = $data['email'];
             }
             
-            if (isset($data['phone'])) $user->phone = $data['phone'];
-            $user->save();
+            if (isset($data['phone'])) $userModel->phone = $data['phone'];
+            $userModel->save();
 
             // 2. Update Agent Profile
-            $profile = \App\Models\AgentProfile::where('user_id', $user->id)->first();
+            $profile = \App\Models\AgentProfile::where('user_id', $userModel->id)->first();
             if ($profile) {
+                if (isset($data['name'])) {
+                    $parts = explode(' ', $data['name'], 2);
+                    $profile->first_name = $parts[0] ?? '';
+                    $profile->last_name = $parts[1] ?? '';
+                }
                 if (isset($data['first_name'])) $profile->first_name = $data['first_name'];
                 if (isset($data['last_name'])) $profile->last_name = $data['last_name'];
                 if (isset($data['address'])) $profile->address = $data['address'];
@@ -183,12 +227,101 @@ class AgentDashboardController
                 $profile->save();
             }
 
-            return ResponseHelper::success($response, 'Profile updated successfully', [
-                'user' => $user->toArray(),
-                'profile' => $profile ? $profile->toArray() : null
-            ]);
+            // Return standardized format
+            $mappedAgent = $profile->toArray();
+            $mappedAgent['user'] = [
+                'id' => $userModel->id,
+                'name' => $userModel->getFullName(),
+                'email' => $userModel->email,
+                'phone' => $userModel->phone,
+                'role' => $userModel->role,
+                'status' => $userModel->status,
+            ];
+
+            $mappedAgent['reports_submitted'] = Issue::where('agent_id', $userModel->id)->count();
+            $mappedAgent['last_active_at'] = $userModel->updated_at->toIso8601String();
+
+            return ResponseHelper::success($response, 'Profile updated successfully', ['agent' => $mappedAgent]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update profile', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Upload profile image
+     * POST /v1/agent/profile/image
+     */
+    public function uploadProfileImage(Request $request, Response $response): Response
+    {
+        try {
+            $user = $request->getAttribute('user');
+            $uploadedFiles = $request->getUploadedFiles();
+
+            if (empty($uploadedFiles['profile_image'])) {
+                return ResponseHelper::error($response, 'No image uploaded', 400);
+            }
+
+            /** @var UploadedFileInterface $uploadedFile */
+            $uploadedFile = $uploadedFiles['profile_image'];
+            if ($uploadedFile->getError() !== UPLOAD_ERR_OK) {
+                return ResponseHelper::error($response, 'Upload failed', 400);
+            }
+
+            // Validate file type
+            $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+            if (!in_array($uploadedFile->getClientMediaType(), $allowedTypes)) {
+                return ResponseHelper::error($response, 'Invalid file type. Only JPG, PNG, GIF and WEBP are allowed.', 400);
+            }
+
+            // Create directory if not exists
+            $uploadDir = BASE . 'public/uploads/profiles/';
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true);
+            }
+
+            // Generate filename
+            $extension = pathinfo($uploadedFile->getClientFilename(), PATHINFO_EXTENSION);
+            $filename = sprintf('agent_%d_%s.%s', $user->id, bin2hex(random_bytes(8)), $extension ?: 'jpg');
+            
+            $uploadedFile->moveTo($uploadDir . $filename);
+            
+            // Get base URL for images
+            $baseUrl = $_ENV['APP_URL'] ?? 'http://localhost:8080';
+            $imageUrl = $baseUrl . '/uploads/profiles/' . $filename;
+
+            // Update profile
+            $profile = \App\Models\AgentProfile::where('user_id', $user->id)->first();
+            if ($profile) {
+                // Delete old image if exists and is local
+                if ($profile->profile_image && strpos($profile->profile_image, $baseUrl) !== false) {
+                    $oldFilename = basename($profile->profile_image);
+                    $oldPath = $uploadDir . $oldFilename;
+                    if (file_exists($oldPath) && is_file($oldPath)) {
+                        @unlink($oldPath);
+                    }
+                }
+                
+                $profile->profile_image = $imageUrl;
+                $profile->save();
+            }
+
+            // Return standardized format
+            $userModel = User::find($user->id);
+            $mappedAgent = $profile->toArray();
+            $mappedAgent['user'] = [
+                'id' => $userModel->id,
+                'name' => $userModel->getFullName(),
+                'email' => $userModel->email,
+                'phone' => $userModel->phone,
+                'role' => $userModel->role,
+                'status' => $userModel->status,
+            ];
+            $mappedAgent['reports_submitted'] = Issue::where('agent_id', $userModel->id)->count();
+            $mappedAgent['last_active_at'] = $userModel->updated_at->toIso8601String();
+
+            return ResponseHelper::success($response, 'Profile image updated successfully', ['agent' => $mappedAgent]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to upload profile image', 500, $e->getMessage());
         }
     }
 }

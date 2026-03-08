@@ -133,7 +133,7 @@ class IssueController
             }
 
             // 2. Validation for Issue Fields
-            $required = ['title', 'description', 'category_id', 'sector_id', 'sub_sector_id', 'community_id'];
+            $required = ['title', 'description', 'category_id', 'sector_id', 'community_id'];
             foreach ($required as $field) {
                 if (empty($data[$field])) {
                     return ResponseHelper::error($response, "Field '{$field}' is required", 400);

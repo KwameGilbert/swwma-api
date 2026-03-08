@@ -219,6 +219,43 @@ class AuthController
     }
 
     /**
+     * Change password
+     * PUT /auth/password
+     */
+    public function changePassword(Request $request, Response $response): Response
+    {
+        try {
+            $userData = $request->getAttribute('user');
+            $data = $request->getParsedBody();
+
+            if (empty($data['current_password']) || empty($data['new_password'])) {
+                return ResponseHelper::error($response, 'Current and new password are required', 400);
+            }
+
+            $user = User::find($userData->id);
+            if (!$user) {
+                return ResponseHelper::error($response, 'User not found', 404);
+            }
+
+            // Verify current password
+            if (!$this->authService->verifyPassword($data['current_password'], $user->password)) {
+                return ResponseHelper::error($response, 'Current password is incorrect', 400);
+            }
+
+            // Update password
+            $user->password = $data['new_password']; // Mutator handles hashing
+            $user->save();
+
+            // Log event
+            $this->activityLogger->logUpdate($user->id, 'User', (int)$user->id, ['password' => 'MASKED'], ['password' => 'UPDATED']);
+
+            return ResponseHelper::success($response, 'Password updated successfully');
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to update password', 500, $e->getMessage());
+        }
+    }
+
+    /**
      * Refresh access token
      */
     public function refresh(Request $request, Response $response): Response

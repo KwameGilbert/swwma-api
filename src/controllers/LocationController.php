@@ -69,7 +69,7 @@ class LocationController
                 return ResponseHelper::error($response, 'Location not found', 404);
             }
 
-            return ResponseHelper::success($response, 'Location fetched successfully', $location->toArray());
+            return ResponseHelper::success($response, 'Location fetched successfully', ['location' => $location->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch location', 500, $e->getMessage());
         }
@@ -104,7 +104,7 @@ class LocationController
                 'parent_id' => $data['parent_id'] ?? null
             ]);
 
-            return ResponseHelper::success($response, 'Location created successfully', $location->toArray(), 201);
+            return ResponseHelper::success($response, 'Location created successfully', ['location' => $location->toArray()], 201);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to create location', 500, $e->getMessage());
         }
@@ -129,7 +129,7 @@ class LocationController
             
             $location->update($updates);
 
-            return ResponseHelper::success($response, 'Location updated successfully', $location->toArray());
+            return ResponseHelper::success($response, 'Location updated successfully', ['location' => $location->toArray()]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update location', 500, $e->getMessage());
         }
