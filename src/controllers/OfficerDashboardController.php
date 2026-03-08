@@ -213,6 +213,80 @@ class OfficerDashboardController
     }
 
     /**
+     * Get list of active agents for assignment
+     * GET /v1/officer/agents
+     */
+    public function getAgents(Request $request, Response $response): Response
+    {
+        try {
+            $users = User::where('role', User::ROLE_AGENT)
+                ->where('status', User::STATUS_ACTIVE)
+                ->with('agentProfile')
+                ->get();
+            
+            $agents = $users->map(function ($user) {
+                return [
+                    'id' => $user->id,
+                    'name' => $user->getFullName(),
+                    'email' => $user->email,
+                    'phone' => $user->phone,
+                ];
+            });
+            
+            return ResponseHelper::success($response, 'Agents fetched successfully', [
+                'agents' => $agents
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch agents', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get detailed list of agents for management
+     * GET /v1/officer/management/agents
+     */
+    public function getManagementAgents(Request $request, Response $response): Response
+    {
+        try {
+            $queryParams = $request->getQueryParams();
+            
+            $query = User::where('role', User::ROLE_AGENT)
+                ->with(['agentProfile']);
+
+            if (!empty($queryParams['status']) && $queryParams['status'] !== 'all') {
+                $query->where('status', $queryParams['status']);
+            }
+
+            $users = $query->get();
+            
+            $agents = $users->map(function ($user) {
+                $profile = $user->agentProfile;
+                return [
+                    'id' => $user->id,
+                    'agent_code' => $profile->agent_code ?? 'N/A',
+                    'profile_image' => $profile->profile_image ?? null,
+                    'id_verified' => $profile->id_verified ?? false,
+                    'assigned_location' => $profile->address ?? 'Not Assigned',
+                    'reports_submitted' => \App\Models\Issue::where('agent_id', $user->id)->count(),
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->getFullName(),
+                        'email' => $user->email,
+                        'phone' => $user->phone,
+                        'status' => $user->status
+                    ]
+                ];
+            });
+            
+            return ResponseHelper::success($response, 'Management agents fetched successfully', [
+                'agents' => $agents
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch management agents', 500, $e->getMessage());
+        }
+    }
+
+    /**
      * Get top agent performance metrics
      * GET /v1/officer/reports/agent-performance
      */
@@ -220,10 +294,7 @@ class OfficerDashboardController
     {
         try {
             $limit = (int)($request->getQueryParams()['limit'] ?? 10);
-            
-            // For now, mock or select from agents who submitted issues
             $agents = []; // This could query users with role Agent, and count their issues.
-            
             return ResponseHelper::success($response, 'Agent performance fetched', [
                 'agents' => $agents
             ]);

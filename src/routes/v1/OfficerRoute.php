@@ -22,6 +22,8 @@ return function (App $app): void {
     $app->group('/v1/officer', function (RouteCollectorProxy $group) use ($officerDashboardController, $issueController) {
         
         $group->get('/dashboard/stats', [$officerDashboardController, 'getStats']);
+        $group->get('/agents', [$officerDashboardController, 'getAgents']);
+        $group->get('/management/agents', [$officerDashboardController, 'getManagementAgents']);
 
         $group->group('/reports', function (RouteCollectorProxy $reportsGroup) use ($officerDashboardController) {
             $reportsGroup->get('/summary', [$officerDashboardController, 'getSummary']);
@@ -38,6 +40,7 @@ return function (App $app): void {
         $group->post('/issues', [$issueController, 'create']);
         $group->get('/issues/{id}', [$officerDashboardController, 'getIssueDetail']);
         $group->put('/issues/{id}', [$issueController, 'update']);
+        $group->post('/issues/{id}', [$issueController, 'update']); // For FormData (images)
         $group->patch('/issues/{id}/status', [$issueController, 'updateStatus']); // Added status endpoint
         $group->delete('/issues/{id}', [$issueController, 'delete']);
 

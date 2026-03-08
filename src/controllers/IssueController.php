@@ -161,7 +161,7 @@ class IssueController
                 'community_id' => $data['community_id'],
                 'suburb_id' => $data['suburb_id'] ?? null,
                 'specific_location' => $data['specific_location'] ?? null,
-                'details' => $data['details'] ?? null,
+                'details' => $data['details'] ?? $data['additional_notes'] ?? null,
                 'status' => $data['status'] ?? Issue::STATUS_SUBMITTED,
                 'priority' => $data['priority'] ?? 'medium',
                 'images' => $images,
@@ -247,6 +247,25 @@ class IssueController
                 
                 $this->uploadService->deleteMultipleFiles($imagesToDelete);
                 $updateData['images'] = array_values($remainingImages);
+            }
+
+            if (!empty($data['additional_notes']) && empty($updateData['details'])) {
+                $updateData['details'] = $data['additional_notes'];
+            }
+
+            // Update constituent details if provided
+            if ($issue->constituent_id) {
+                $constituent = $issue->constituent;
+                $constituentData = [];
+                if (!empty($data['constituent_name'])) $constituentData['name'] = $data['constituent_name'];
+                if (!empty($data['constituent_phone'])) $constituentData['phone_number'] = $data['constituent_phone'];
+                if (!empty($data['constituent_email'])) $constituentData['email'] = $data['constituent_email'];
+                if (!empty($data['constituent_gender'])) $constituentData['gender'] = $data['constituent_gender'];
+                if (!empty($data['constituent_address'])) $constituentData['home_address'] = $data['constituent_address'];
+                
+                if (!empty($constituentData)) {
+                    $constituent->update($constituentData);
+                }
             }
 
             $issue->update($updateData);
