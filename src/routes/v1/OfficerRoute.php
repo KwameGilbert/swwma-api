@@ -38,6 +38,7 @@ return function (App $app): void {
         $group->post('/issues', [$issueController, 'create']);
         $group->get('/issues/{id}', [$officerDashboardController, 'getIssueDetail']);
         $group->put('/issues/{id}', [$issueController, 'update']);
+        $group->patch('/issues/{id}/status', [$issueController, 'updateStatus']); // Added status endpoint
         $group->delete('/issues/{id}', [$issueController, 'delete']);
 
     })->add(new RoleMiddleware([User::ROLE_OFFICER, User::ROLE_ADMIN]))

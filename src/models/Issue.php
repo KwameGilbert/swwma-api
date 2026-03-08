@@ -29,6 +29,7 @@ class Issue extends Model
         'estimated_budget',
         'status',
         'priority',
+        'details',
         'images',
         'constituent_id',
         'agent_id',

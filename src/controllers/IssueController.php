@@ -11,6 +11,7 @@ use App\Helper\ResponseHelper;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use App\Services\ActivityLogService;
+use App\Services\UploadService;
 use Exception;
 
 /**
@@ -20,10 +21,12 @@ use Exception;
 class IssueController
 {
     private ActivityLogService $activityLogger;
+    private UploadService $uploadService;
 
-    public function __construct(ActivityLogService $activityLogger)
+    public function __construct(ActivityLogService $activityLogger, UploadService $uploadService)
     {
         $this->activityLogger = $activityLogger;
+        $this->uploadService = $uploadService;
     }
 
     /**
@@ -140,6 +143,13 @@ class IssueController
                 }
             }
 
+            // 2. Handle Image Uploads
+            $uploadedFiles = $request->getUploadedFiles();
+            $images = [];
+            if (!empty($uploadedFiles['images'])) {
+                $images = $this->uploadService->uploadMultipleFiles($uploadedFiles['images'], 'image', 'issues');
+            }
+
             // 3. Create the Issue
             $authUser = $request->getAttribute('user');
             $issueData = [
@@ -154,7 +164,7 @@ class IssueController
                 'details' => $data['details'] ?? null,
                 'status' => $data['status'] ?? Issue::STATUS_SUBMITTED,
                 'priority' => $data['priority'] ?? 'medium',
-                'images' => $data['images'] ?? [],
+                'images' => $images,
                 'constituent_id' => $constituentId
             ];
 
@@ -203,9 +213,41 @@ class IssueController
             $allowed = [
                 'title', 'description', 'category_id', 'sector_id', 'sub_sector_id', 
                 'community_id', 'suburb_id', 'specific_location', 'details', 
-                'status', 'priority', 'images', 'agent_id'
+                'status', 'priority', 'images', 'agent_id', 'people_affected'
             ];
             $updateData = array_intersect_key($data, array_flip($allowed));
+
+            // Handle Image Uploads for Update
+            $uploadedFiles = $request->getUploadedFiles();
+            if (!empty($uploadedFiles['images'])) {
+                $newImages = $this->uploadService->uploadMultipleFiles($uploadedFiles['images'], 'image', 'issues');
+                
+                // If the user wants to append new images or replace them
+                // For now, let's append them to existing ones if 'keep_existing_images' is true, else replace
+                if (!empty($data['keep_existing_images']) && (bool)$data['keep_existing_images'] === true) {
+                    $existingImages = is_array($issue->images) ? $issue->images : [];
+                    $updateData['images'] = array_merge($existingImages, $newImages);
+                } else {
+                    // If replacing, we might want to delete old files from disk
+                    if (is_array($issue->images)) {
+                        $this->uploadService->deleteMultipleFiles($issue->images);
+                    }
+                    $updateData['images'] = $newImages;
+                }
+            }
+            
+            // Handle image deletions if specifically requested
+            if (!empty($data['delete_images']) && is_array($data['delete_images'])) {
+                $existingImages = is_array($issue->images) ? $issue->images : [];
+                $imagesToDelete = $data['delete_images'];
+                
+                $remainingImages = array_filter($existingImages, function($img) use ($imagesToDelete) {
+                    return !in_array($img, $imagesToDelete);
+                });
+                
+                $this->uploadService->deleteMultipleFiles($imagesToDelete);
+                $updateData['images'] = array_values($remainingImages);
+            }
 
             $issue->update($updateData);
 

@@ -93,7 +93,10 @@ return function ($container) {
     });
 
     $container->set(IssueController::class, function ($container) {
-        return new IssueController($container->get(ActivityLogService::class));
+        return new IssueController(
+            $container->get(ActivityLogService::class),
+            $container->get(UploadService::class)
+        );
     });
 
     $container->set(IssueAssessmentController::class, function ($container) {

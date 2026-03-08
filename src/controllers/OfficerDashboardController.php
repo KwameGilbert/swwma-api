@@ -185,10 +185,13 @@ class OfficerDashboardController
             
             $colors = [
                 Issue::STATUS_SUBMITTED => '#3b82f6', // blue
-                'under_review' => '#f59e0b', // amber
-                Issue::STATUS_RESOLVED => '#10b981', // green
-                'rejected' => '#ef4444', // red
+                'under_officer_review' => '#f59e0b', // amber
+                'forwarded_to_admin' => '#6366f1', // indigo
+                'assigned_to_task_force' => '#06b6d4', // cyan
                 Issue::STATUS_ASSESSMENT_IN_PROGRESS => '#8b5cf6', // purple
+                Issue::STATUS_RESOLVED => '#10b981', // green
+                'closed' => '#64748b', // gray
+                'rejected' => '#ef4444', // red
             ];
 
             $distribution = $distributionRaw->map(function ($item) use ($colors) {
@@ -432,15 +435,20 @@ class OfficerDashboardController
                 'case_id' => 'ISS-' . str_pad((string)$issue->id, 5, '0', STR_PAD_LEFT),
                 'title' => $issue->title,
                 'description' => $issue->description,
-                'category' => $issue->category_name,
+                'category' => $issue->category->name ?? 'Unknown',
+                'category_id' => $issue->category_id,
                 'community' => $issue->community->name ?? 'Unknown',
+                'community_id' => $issue->community_id,
                 'suburb' => $issue->suburb->name ?? null,
+                'suburb_id' => $issue->suburb_id,
                 'specific_location' => $issue->specific_location,
                 'status' => $issue->status,
                 'priority' => $issue->priority,
                 'issue_type' => $issue->issue_type,
                 'sector' => $issue->sector->name ?? null,
+                'sector_id' => $issue->sector_id,
                 'subsector' => $issue->subsector->name ?? null,
+                'sub_sector_id' => $issue->sub_sector_id,
                 'people_affected' => $issue->people_affected,
                 'estimated_budget' => $issue->estimated_budget,
                 'additional_notes' => $issue->details,
