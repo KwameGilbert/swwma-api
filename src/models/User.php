@@ -10,23 +10,18 @@ use Illuminate\Database\Eloquent\Model;
  * User Model
  * 
  * Represents a user in the system.
- * Merges functionality for authentication, relationships, and status checks.
+ * Handles authentication, relationships, and status checks.
  *
  * @property int $id
- * @property string $name
  * @property string $email
  * @property string|null $phone
  * @property string $password
  * @property string|null $remember_token
- * @property string $role
  * @property bool $email_verified
- * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string $role
  * @property string $status
- * @property bool $first_login
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $last_login_at
- * @property string|null $last_login_ip
  */
 class User extends Model
 {
@@ -37,55 +32,17 @@ class User extends Model
     protected $table = 'users';
 
     /**
-     * The primary key for the model.
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     * @var bool
-     */
-    public $incrementing = true;
-
-    /**
-     * Indicates if the model should be timestamped.
-     * @var bool
-     */
-    public $timestamps = true;
-
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
-
-    // Roles
-    const ROLE_ADMIN = 'admin';
-    const ROLE_ORGANIZER = 'organizer';
-    const ROLE_ATTENDEE = 'attendee';
-    const ROLE_POS = 'pos';
-    const ROLE_SCANNER = 'scanner';
-
-    // Status
-    const STATUS_ACTIVE = 'active';
-    const STATUS_INACTIVE = 'inactive';
-    const STATUS_SUSPENDED = 'suspended';
-
-    /**
      * The attributes that are mass assignable.
      * @var array
      */
     protected $fillable = [
-        'name',
         'email',
         'phone',
         'password',
         'remember_token',
         'role',
         'email_verified',
-        'email_verified_at',
         'status',
-        'first_login',
-        'last_login_at',
-        'last_login_ip',
     ];
 
     /**
@@ -103,12 +60,21 @@ class User extends Model
      */
     protected $casts = [
         'email_verified' => 'boolean',
-        'first_login' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'email_verified_at' => 'datetime',
-        'last_login_at' => 'datetime',
     ];
+
+    // Status Constants
+    const STATUS_ACTIVE = 'active';
+    const STATUS_SUSPENDED = 'suspended';
+    const STATUS_PENDING = 'pending';
+
+    // Role Constants
+    const ROLE_ADMIN = 'admin';
+    const ROLE_WEB_ADMIN = 'web_admin';
+    const ROLE_OFFICER = 'officer';
+    const ROLE_AGENT = 'agent';
+    const ROLE_TASK_FORCE = 'task_force';
 
     /* -----------------------------------------------------------------
      |  Mutators & Accessors
@@ -117,20 +83,16 @@ class User extends Model
 
     /**
      * Auto-hash password with Argon2id on set.
-     * * @param string $value
-     * @return void
      */
     public function setPasswordAttribute($value)
     {
-        // Check if value is already hashed (starts with $argon2 or $2y$)
         if (preg_match('/^(\$argon2|\$2y\$)/', $value)) {
             $this->attributes['password'] = $value;
         } else {
-            // Hash with Argon2id
             $this->attributes['password'] = password_hash($value, PASSWORD_ARGON2ID, [
-                'memory_cost' => 65536,  // 64 MB
-                'time_cost' => 4,        // 4 iterations
-                'threads' => 2           // 2 parallel threads
+                'memory_cost' => 65536,
+                'time_cost' => 4,
+                'threads' => 2
             ]);
         }
     }
@@ -142,38 +104,10 @@ class User extends Model
 
     /**
      * Get user by email.
-     * * @param string $email
-     * @return User|null
      */
     public static function findByEmail(string $email): ?User
     {
         return static::where('email', $email)->first();
-    }
-
-    /**
-     * Check if email exists.
-     * * @param string $email Email to check
-     * @param int|null $excludeId Optional user ID to exclude (useful for updates)
-     * @return bool
-     */
-    public static function emailExists(string $email, ?int $excludeId = null): bool
-    {
-        $query = static::where('email', $email);
-        
-        if ($excludeId) {
-            $query->where('id', '!=', $excludeId);
-        }
-        
-        return $query->exists();
-    }
-
-    /**
-     * Get all active users.
-     * * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public static function getActiveUsers()
-    {
-        return static::where('status', 'active')->get();
     }
 
     /* -----------------------------------------------------------------
@@ -181,36 +115,30 @@ class User extends Model
      | -----------------------------------------------------------------
      */
 
-    /**
-     * Check if email is verified.
-     */
-    public function hasVerifiedEmail(): bool
-    {
-        return !is_null($this->email_verified_at);
-    }
-
-    /**
-     * Check if user is organizer.
-     */
-    public function isOrganizer(): bool
-    {
-        return $this->role === 'organizer';
-    }
-
-    /**
-     * Check if user is admin.
-     */
-    public function isAdmin(): bool
-    {
-        return $this->role === 'admin';
-    }
-
-    /**
-     * Check if user is active.
-     */
     public function isActive(): bool
     {
-        return $this->status === 'active';
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    /**
+     * Get the profile associated with the user's role.
+     */
+    public function getProfile()
+    {
+        switch ($this->role) {
+            case self::ROLE_WEB_ADMIN:
+                return $this->webAdminProfile;
+            case self::ROLE_OFFICER:
+                return $this->officerProfile;
+            case self::ROLE_AGENT:
+                return $this->agentProfile;
+            case self::ROLE_TASK_FORCE:
+                return $this->taskForceProfile;
+            case self::ROLE_ADMIN:
+                return $this->adminProfile;
+            default:
+                return null;
+        }
     }
 
     /* -----------------------------------------------------------------
@@ -218,23 +146,42 @@ class User extends Model
      | -----------------------------------------------------------------
      */
     
-    public function organizer()
+    public function webAdminProfile()
     {
-        return $this->hasOne(Organizer::class, 'user_id');
+        return $this->hasOne(WebAdminProfile::class, 'user_id');
     }
 
-    public function attendee()
+    public function officerProfile()
     {
-        return $this->hasOne(Attendee::class, 'user_id');
+        return $this->hasOne(OfficerProfile::class, 'user_id');
+    }
+
+    public function agentProfile()
+    {
+        return $this->hasOne(AgentProfile::class, 'user_id');
+    }
+
+    public function taskForceProfile()
+    {
+        return $this->hasOne(TaskForceProfile::class, 'user_id');
+    }
+
+    public function adminProfile()
+    {
+        return $this->hasOne(AdminProfile::class, 'user_id');
+    }
+
+    public function getFullName(): string
+    {
+        $profile = $this->getProfile();
+        if ($profile) {
+            return trim($profile->first_name . ' ' . $profile->last_name);
+        }
+        return $this->email;
     }
 
     public function refreshTokens()
     {
         return $this->hasMany(RefreshToken::class);
-    }
-
-    public function auditLogs()
-    {
-        return $this->hasMany(AuditLog::class);
     }
 }

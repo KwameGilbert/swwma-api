@@ -1,63 +1,51 @@
 <?php
 return function ($app): void {
     // Define API routes here. This file is responsible for registering all API endpoints.
-    // Get the request URI
     $requestUri = $_SERVER['REQUEST_URI'] ?? '';
 
-    // Map route prefixes to their router files
-    // IMPORTANT: More specific prefixes MUST come before less specific ones
-    // e.g., '/v1/organizers/finance' must come before '/v1/organizers'
+    /**
+     * Route Map
+     * Maps path prefixes to their respective route loader files.
+     */
     $routeMap = [
         // Auth & Users
         '/v1/auth' => ROUTE . 'v1/AuthRoute.php',
         '/v1/users' => ROUTE . 'v1/UserRoute.php',
+        
+        // Lookup Data
+        '/v1/locations' => ROUTE . 'v1/LocationRoute.php',
+        '/v1/categories' => ROUTE . 'v1/CategoryRoute.php',
+        '/v1/sectors' => ROUTE . 'v1/SectorRoute.php',
+        '/v1/sub-sectors' => ROUTE . 'v1/SubSectorRoute.php',
+        '/v1/constituents' => ROUTE . 'v1/ConstituentRoute.php',
+        '/v1/issues' => ROUTE . 'v1/IssueRoute.php',
+        
+        // Content & Community
+        '/v1/community-ideas' => ROUTE . 'v1/ContentRoute.php',
+        '/v1/blog-posts' => ROUTE . 'v1/ContentRoute.php',
+        '/v1/content' => ROUTE . 'v1/ContentRoute.php',
 
-        // Organizers (specific routes first)
-        '/v1/organizers/finance' => ROUTE . 'v1/PayoutRoute.php',
-        '/v1/organizers' => ROUTE . 'v1/OrganizerRoute.php',
+        // Development & Projects
+        '/v1/projects' => ROUTE . 'v1/DevelopmentRoute.php',
+        '/v1/events' => ROUTE . 'v1/DevelopmentRoute.php',
+        '/v1/development' => ROUTE . 'v1/DevelopmentRoute.php',
 
-        // Attendees
-        '/v1/attendees' => ROUTE . 'v1/AttendeeRoute.php',
+        // Employment
+        '/v1/jobs' => ROUTE . 'v1/EmploymentRoute.php',
+        '/v1/job-applicants' => ROUTE . 'v1/EmploymentRoute.php',
+        '/v1/employment' => ROUTE . 'v1/EmploymentRoute.php',
+        '/v1/agent' => ROUTE . 'v1/AgentRoute.php',
 
-        // Events & related
-        '/v1/event-images' => ROUTE . 'v1/EventImageRoute.php',
-        '/v1/events' => ROUTE . 'v1/EventRoute.php',
-
-        // Tickets
-        '/v1/ticket-types' => ROUTE . 'v1/TicketTypeRoute.php',
-        '/v1/tickets' => ROUTE . 'v1/TicketRoute.php',
-
-        // Orders & Payments
-        '/v1/orders' => ROUTE . 'v1/OrderRoute.php',
-        '/v1/payment' => ROUTE . 'v1/OrderRoute.php', // Paystack webhook
-
-        // Scanners & POS
-        '/v1/scanners' => ROUTE . 'v1/ScannerRoute.php',
-        '/v1/pos' => ROUTE . 'v1/PosRoute.php',
-
-        // Awards & related
-        '/v1/award-categories' => ROUTE . 'v1/AwardCategoryRoute.php',
-        '/v1/awards' => ROUTE . 'v1/AwardRoute.php',
-        '/v1/nominees' => ROUTE . 'v1/AwardNomineeRoute.php',
-        '/v1/votes' => ROUTE . 'v1/AwardVoteRoute.php',
-
-        // Utils
+        // System
         '/v1/utils' => ROUTE . 'v1/UtilsRoute.php',
-
-        // Admin (specific routes first)
-        '/v1/admin/payouts' => ROUTE . 'v1/PayoutRoute.php',
-        '/v1/admin/analytics' => ROUTE . 'v1/AdminRoute.php',
-        '/v1/admin/settings' => ROUTE . 'v1/AdminRoute.php',
-        '/v1/admin' => ROUTE . 'v1/AdminRoute.php',
     ];
 
     $loadedFiles = [];
     $loaded = false;
 
-    // Check if the request matches any of our defined prefixes
+    // Direct routing for efficiency based on prefix
     foreach ($routeMap as $prefix => $routerFile) {
         if (strpos($requestUri, $prefix) === 0) {
-            // Load only the matching router
             if (file_exists($routerFile) && !in_array($routerFile, $loadedFiles)) {
                 $routeLoader = require $routerFile;
                 if (is_callable($routeLoader)) {
@@ -69,7 +57,7 @@ return function ($app): void {
         }
     }
 
-    // If no specific router was loaded, load all routers as fallback
+    // Fallback if the path didn't match a specific prefix (e.g., base path or misc)
     if (!$loaded) {
         foreach ($routeMap as $routerFile) {
             if (file_exists($routerFile) && !in_array($routerFile, $loadedFiles)) {

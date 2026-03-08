@@ -10,6 +10,7 @@ use Firebase\JWT\Key;
 use Exception;
 use App\Models\RefreshToken;
 use App\Models\AuditLog;
+use App\Models\User;
 
 
 /**
@@ -177,8 +178,8 @@ class AuthService
                 $userData = [
                     'id' => $user->id ?? null,
                     'email' => $user->email ?? null,
-                    'role' => $user->role ?? 'attendee',
-                    'status' => $user->status ?? 'active',
+                    'role' => $user->role ?? User::ROLE_WEB_ADMIN,
+                    'status' => $user->status ?? User::STATUS_ACTIVE,
                 ];
             }
         } else {
@@ -188,8 +189,8 @@ class AuthService
         return [
             'id' => $userData['id'] ?? null,
             'email' => $userData['email'] ?? null,
-            'role' => $userData['role'] ?? 'attendee',
-            'status' => $userData['status'] ?? 'active'
+            'role' => $userData['role'] ?? User::ROLE_WEB_ADMIN,
+            'status' => $userData['status'] ?? User::STATUS_ACTIVE
         ];
     }
 

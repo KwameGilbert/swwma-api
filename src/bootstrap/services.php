@@ -9,24 +9,24 @@
 use App\Services\EmailService;
 use App\Services\SMSService;
 use App\Services\AuthService;
-use App\Services\PasswordResetService;
-use App\Services\VerificationService;
+use App\Services\ActivityLogService;
+use App\Services\UploadService;
 use App\Controllers\AuthController;
 use App\Controllers\UserController;
-use App\Controllers\OrganizerController;
+use App\Controllers\LocationController;
+use App\Controllers\CategoryController;
+use App\Controllers\SectorController;
+use App\Controllers\SubSectorController;
+use App\Controllers\ConstituentController;
+use App\Controllers\IssueController;
+use App\Controllers\IssueAssessmentController;
+use App\Controllers\IssueResolutionController;
+use App\Controllers\IssueAllocationController;
+use App\Controllers\ContentManagementController;
+use App\Controllers\DevelopmentManagementController;
+use App\Controllers\EmploymentController;
 use App\Controllers\PasswordResetController;
-use App\Controllers\AttendeeController;
-use App\Controllers\EventController;
-use App\Controllers\EventImageController;
-use App\Controllers\TicketTypeController;
-use App\Controllers\OrderController;
-use App\Controllers\TicketController;
-use App\Controllers\ScannerController;
-use App\Controllers\PosController;
-use App\Controllers\AwardController;
-use App\Controllers\AwardCategoryController;
-use App\Controllers\AwardNomineeController;
-use App\Controllers\AwardVoteController;
+use App\Controllers\AgentDashboardController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RateLimitMiddleware;
 use App\Middleware\JsonBodyParserMiddleware;
@@ -47,34 +47,12 @@ return function ($container) {
         return new AuthService();
     });
     
-    $container->set(PasswordResetService::class, function ($container) {
-        return new PasswordResetService($container->get(EmailService::class));
-    });
-    
-    $container->set(VerificationService::class, function ($container) {
-        return new VerificationService($container->get(EmailService::class));
+    $container->set(ActivityLogService::class, function () {
+        return new ActivityLogService();
     });
 
-    // Notification System Services
-    $container->set(\App\Services\NotificationQueue::class, function () {
-        return new \App\Services\NotificationQueue();
-    });
-
-    $container->set(\App\Services\TemplateEngine::class, function () {
-        return new \App\Services\TemplateEngine();
-    });
-
-    $container->set(\App\Services\UploadService::class, function () {
-        return new \App\Services\UploadService();
-    });
-
-    $container->set(\App\Services\NotificationService::class, function ($container) {
-        return new \App\Services\NotificationService(
-            $container->get(EmailService::class),
-            $container->get(SMSService::class),
-            $container->get(\App\Services\NotificationQueue::class),
-            $container->get(\App\Services\TemplateEngine::class)
-        );
+    $container->set(UploadService::class, function () {
+        return new UploadService();
     });
 
     $container->set(\Psr\Http\Message\ResponseFactoryInterface::class, function () {
@@ -84,15 +62,66 @@ return function ($container) {
     // ==================== CONTROLLERS ====================
     
     $container->set(AuthController::class, function ($container) {
-        return new AuthController($container->get(AuthService::class));
+        return new AuthController(
+            $container->get(AuthService::class),
+            $container->get(ActivityLogService::class)
+        );
     });
     
-    $container->set(UserController::class, function () {
-        return new UserController();
+    $container->set(UserController::class, function ($container) {
+        return new UserController($container->get(ActivityLogService::class));
     });
 
-    $container->set(OrganizerController::class, function () {
-        return new OrganizerController();
+    $container->set(LocationController::class, function ($container) {
+        return new LocationController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(CategoryController::class, function ($container) {
+        return new CategoryController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(SectorController::class, function ($container) {
+        return new SectorController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(SubSectorController::class, function ($container) {
+        return new SubSectorController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(ConstituentController::class, function ($container) {
+        return new ConstituentController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(IssueController::class, function ($container) {
+        return new IssueController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(IssueAssessmentController::class, function ($container) {
+        return new IssueAssessmentController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(IssueResolutionController::class, function ($container) {
+        return new IssueResolutionController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(IssueAllocationController::class, function ($container) {
+        return new IssueAllocationController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(ContentManagementController::class, function ($container) {
+        return new ContentManagementController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(DevelopmentManagementController::class, function ($container) {
+        return new DevelopmentManagementController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(EmploymentController::class, function ($container) {
+        return new EmploymentController($container->get(ActivityLogService::class));
+    });
+
+    $container->set(AgentDashboardController::class, function () {
+        return new AgentDashboardController();
     });
     
     $container->set(PasswordResetController::class, function ($container) {
@@ -100,62 +129,6 @@ return function ($container) {
             $container->get(AuthService::class),
             $container->get(EmailService::class)
         );
-    });
-
-    $container->set(AttendeeController::class, function () {
-        return new AttendeeController();
-    });
-
-    $container->set(EventController::class, function () {
-        return new EventController();
-    });
-
-    $container->set(EventImageController::class, function ($container) {
-        return new EventImageController(
-            $container->get(\App\Services\UploadService::class)
-        );
-    });
-
-    $container->set(TicketTypeController::class, function () {
-        return new TicketTypeController();
-    });
-
-   $container->set(OrderController::class, function ($container) {
-        return new OrderController(
-            $container->get(\App\Services\NotificationService::class)
-        );
-    });
-
-    $container->set(TicketController::class, function () {
-        return new TicketController();
-    });
-
-    $container->set(ScannerController::class, function () {
-        return new ScannerController();
-    });
-
-    $container->set(PosController::class, function () {
-        return new PosController();
-    });
-
-    $container->set(AwardController::class, function ($container) {
-        return new AwardController(
-            $container->get(\App\Services\UploadService::class)
-        );
-    });
-
-    $container->set(AwardCategoryController::class, function () {
-        return new AwardCategoryController();
-    });
-
-    $container->set(AwardNomineeController::class, function ($container) {
-        return new AwardNomineeController(
-            $container->get(\App\Services\UploadService::class)
-        );
-    });
-
-    $container->set(AwardVoteController::class, function () {
-        return new AwardVoteController();
     });
     
     // ==================== MIDDLEWARES ====================
@@ -172,6 +145,5 @@ return function ($container) {
         return new JsonBodyParserMiddleware();
     });
 
-    
     return $container;
 };

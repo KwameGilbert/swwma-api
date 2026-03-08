@@ -15,7 +15,13 @@ use App\Config\EloquentBootstrap;
 
 // Load environment variables
 $dotenv = Dotenv::createImmutable(BASE);
-$dotenv->load();
+$dotenv->safeLoad();
+
+// Show errors in development
+if (($_ENV['APP_ENV'] ?? 'development') === 'development') {
+    error_reporting(E_ALL);
+    ini_set('display_errors', '1');
+}
 
 // Load application configuration
 $config = require CONFIG . '/AppConfig.php';
