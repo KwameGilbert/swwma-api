@@ -27,7 +27,7 @@
     }
   },
   "require": {
-    "firebase/php-jwt": "^6.11",
+    "firebase/php-jwt": "^7.0",
     "illuminate/container": "^10.49",
     "illuminate/database": "^10.0",
     "illuminate/events": "^10.49",
