@@ -23,7 +23,7 @@ class CreateAdminUser extends AbstractSeed
         $passwordHash = password_hash('Admin@123', PASSWORD_ARGON2ID, [
             'memory_cost' => 65536,  
             'time_cost' => 4,        
-            'threads' => 2           // 2 parallel threads
+            'threads' => 2           
         ]);
 
         // Insert admin user
