@@ -39,7 +39,7 @@ class VerificationService
     {
         try {
             if ($user->hasVerifiedEmail()) {
-                return false; // Already verified
+                return false;
             }
 
             $verificationUrl = $this->generateVerificationUrl($user);
