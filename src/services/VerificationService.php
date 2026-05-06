@@ -26,7 +26,7 @@ class VerificationService
     {
         $this->emailService = $emailService;
         $this->appUrl = $_ENV['APP_URL'] ?? 'http://localhost';
-        $this->appKey = $_ENV['JWT_SECRET'] ?? 'your-secret-key';
+        $this->appKey = $_ENV['JWT_SECRET'] ?? 'kj498nioqfj90308h4io398hfoinih398uh3nf';
     }
 
     /**
