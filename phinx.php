@@ -6,7 +6,7 @@ use Dotenv\Dotenv;
 
 // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+$dotenv->safeLoad ();
 
 // Check environment - default to local if not specified
 $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : 'development';
@@ -41,7 +41,7 @@ if ($caCertificate) {
 $developmentConfig = [
     'adapter' => $_ENV['LOCAL_DB_DRIVER'] ?? $_ENV['LOCAL_DB_ADAPTER'] ?? 'mysql',
     'host' => $_ENV['LOCAL_DB_HOST'] ?? '127.0.0.1',
-    'name' => $_ENV['LOCAL_DB_DATABASE'] ?? 'eventic',
+    'name' => $_ENV['LOCAL_DB_DATABASE'] ?? 'swwma_api',
     'user' => $_ENV['LOCAL_DB_USERNAME'] ?? 'root',
     'pass' => $_ENV['LOCAL_DB_PASSWORD'] ?? '',
     'port' => $_ENV['LOCAL_DB_PORT'] ?? '3306',

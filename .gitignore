@@ -1,2 +1,4 @@
 vendor
 .env
+commit-dates.ps1
+commit-dates.sh
