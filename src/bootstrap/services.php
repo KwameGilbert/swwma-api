@@ -27,6 +27,7 @@ use App\Controllers\DevelopmentManagementController;
 use App\Controllers\EmploymentController;
 use App\Controllers\PasswordResetController;
 use App\Controllers\AgentDashboardController;
+use App\Controllers\AdminController;
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RateLimitMiddleware;
 use App\Middleware\JsonBodyParserMiddleware;
@@ -125,6 +126,10 @@ return function ($container) {
 
     $container->set(AgentDashboardController::class, function () {
         return new AgentDashboardController();
+    });
+    
+    $container->set(AdminController::class, function ($container) {
+        return new AdminController($container->get(ActivityLogService::class));
     });
     
     $container->set(PasswordResetController::class, function ($container) {

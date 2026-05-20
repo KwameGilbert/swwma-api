@@ -15,8 +15,16 @@ return function (App $app): void {
 
     // Protected admin routes (require admin authentication)
     $app->group('/v1/admin', function ($group) use ($adminController) {
-        // Dashboard
+        // Dashboard & Stats
         $group->get('/dashboard', [$adminController, 'getDashboard']);
+        $group->get('/dashboard/stats', [$adminController, 'getDashboardStats']);
+
+        // Analytics & Recent Data
+        $group->get('/data/analytics/charts', [$adminController, 'getAdminCharts']);
+        $group->get('/data/recent-issues', [$adminController, 'getRecentIssues']);
+        $group->get('/data/audit-logs', [$adminController, 'getRecentActivity']);
+        $group->get('/data/analytics/metrics', [$adminController, 'getAnalyticsMetrics']);
+        $group->get('/data/analytics/insights', [$adminController, 'getAnalyticsInsights']);
 
         // Users Management
         $group->get('/users', [$adminController, 'getUsers']);

@@ -20,7 +20,7 @@ class UserProfilesSeeder extends AbstractSeed
 
         $users = [
             [
-                'email' => 'admin@example.com',
+                'email' => 'admin@gmail.com',
                 'password' => $passwordHash,
                 'role' => 'admin',
                 'status' => 'active',
@@ -29,7 +29,7 @@ class UserProfilesSeeder extends AbstractSeed
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'email' => 'webadmin@example.com',
+                'email' => 'webadmin@gmail.com',
                 'password' => $passwordHash,
                 'role' => 'web_admin',
                 'status' => 'active',
@@ -38,7 +38,7 @@ class UserProfilesSeeder extends AbstractSeed
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'email' => 'officer@example.com',
+                'email' => 'officer@gmail.com',
                 'password' => $passwordHash,
                 'role' => 'officer',
                 'status' => 'active',
@@ -47,7 +47,7 @@ class UserProfilesSeeder extends AbstractSeed
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'email' => 'agent@example.com',
+                'email' => 'agent@gmail.com',
                 'password' => $passwordHash,
                 'role' => 'agent',
                 'status' => 'active',
@@ -56,7 +56,7 @@ class UserProfilesSeeder extends AbstractSeed
                 'updated_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'email' => 'taskforce@example.com',
+                'email' => 'taskforce@gmail.com',
                 'password' => $passwordHash,
                 'role' => 'task_force',
                 'status' => 'active',
