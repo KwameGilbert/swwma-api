@@ -19,7 +19,10 @@ return function (App $app): void {
     
     // Public get routes (optional: depending on if the app is public facing)
     $app->get('/v1/locations', [$locationController, 'index']);
+    $app->get('/v1/locations/types', [$locationController, 'getLocationTypes']);
+    $app->get('/v1/locations/dashboard-stats', [$locationController, 'getDashboardStats']);
     $app->get('/v1/locations/{id}', [$locationController, 'show']);
+    $app->get('/v1/locations/{id}/stats', [$locationController, 'getLocationStats']);
 
     // Protected management routes
     $app->group('/v1/locations', function (RouteCollectorProxy $group) use ($locationController) {

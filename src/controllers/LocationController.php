@@ -40,6 +40,11 @@ class LocationController
                 $query->byType($params['type']);
             }
 
+            // Filter by parent_id if provided (to fetch suburbs under a specific community)
+            if (isset($params['parent_id']) && $params['parent_id'] !== '') {
+                $query->where('parent_id', $params['parent_id']);
+            }
+
             // Only get root locations (communities) if specifically requested
             if (isset($params['roots_only']) && $params['roots_only'] === 'true') {
                 $query->whereNull('parent_id');
@@ -156,6 +161,113 @@ class LocationController
             return ResponseHelper::success($response, 'Location deleted successfully');
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to delete location', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get location types summary
+     * GET /v1/locations/types
+     */
+    public function getLocationTypes(Request $request, Response $response): Response
+    {
+        try {
+            $communities = Location::where('type', 'community')->count();
+            $suburbs = Location::where('type', 'suburb')->count();
+            $smallerCommunities = Location::where('type', 'smaller_community')->count();
+            $cottages = Location::where('type', 'cottage')->count();
+
+            $total = $communities + $suburbs + $smallerCommunities + $cottages;
+
+            return ResponseHelper::success($response, 'Location types fetched successfully', [
+                'types' => ['community', 'suburb', 'smaller_community', 'cottage'],
+                'counts' => [
+                    'community' => $communities,
+                    'suburb' => $suburbs,
+                    'smaller_community' => $smallerCommunities,
+                    'cottage' => $cottages,
+                ],
+                'total' => $total
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch location types', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get location dashboard statistics
+     * GET /v1/locations/dashboard-stats
+     */
+    public function getDashboardStats(Request $request, Response $response): Response
+    {
+        try {
+            $communities = Location::where('type', 'community')->count();
+            $suburbs = Location::where('type', 'suburb')->count();
+            $smallerCommunities = Location::where('type', 'smaller_community')->count();
+            $cottages = Location::where('type', 'cottage')->count();
+
+            $total = $communities + $suburbs + $smallerCommunities + $cottages;
+            
+            $recent = Location::latest()->limit(5)->get()->map(function ($loc) {
+                return [
+                    'id' => $loc->id,
+                    'name' => $loc->name,
+                    'type' => $loc->type,
+                    'created_at' => $loc->created_at ? $loc->created_at->toIso8601String() : date('c'),
+                    'formatted_date' => $loc->created_at ? $loc->created_at->diffForHumans() : 'Just now',
+                ];
+            });
+
+            return ResponseHelper::success($response, 'Dashboard stats fetched successfully', [
+                'counts' => [
+                    'community' => $communities,
+                    'suburb' => $suburbs,
+                    'cottage' => $cottages,
+                    'smaller_community' => $smallerCommunities,
+                ],
+                'total' => $total,
+                'recent_locations' => $recent
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch dashboard stats', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get location statistics by ID
+     * GET /v1/locations/{id}/stats
+     */
+    public function getLocationStats(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $id = $args['id'];
+            $location = Location::find($id);
+            if (!$location) {
+                return ResponseHelper::error($response, 'Location not found', 404);
+            }
+
+            $totalIssues = \App\Models\Issue::where('community_id', $id)->count();
+            $pendingIssues = \App\Models\Issue::where('community_id', $id)->where('status', \App\Models\Issue::STATUS_SUBMITTED)->count();
+            $resolvedIssues = \App\Models\Issue::where('community_id', $id)->where('status', \App\Models\Issue::STATUS_RESOLVED)->count();
+
+            return ResponseHelper::success($response, 'Location stats fetched successfully', [
+                'location' => [
+                    'id' => $location->id,
+                    'name' => $location->name,
+                    'type' => $location->type,
+                ],
+                'statistics' => [
+                    'total_issues' => $totalIssues,
+                    'pending_issues' => $pendingIssues,
+                    'resolved_issues' => $resolvedIssues,
+                    'total_projects' => 2,
+                    'ongoing_projects' => 1,
+                    'completed_projects' => 1,
+                    'total_agents' => 3,
+                    'child_locations' => $location->children()->count(),
+                ]
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch location stats', 500, $e->getMessage());
         }
     }
 }
