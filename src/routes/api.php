@@ -6,6 +6,7 @@ return function ($app): void {
 
     // Map route prefixes to their router files
     // IMPORTANT: More specific prefixes MUST come before less specific ones
+    
     $routeMap = [
         // Auth & Users
         '/v1/auth' => ROUTE . 'v1/AuthRoute.php',
@@ -34,6 +35,7 @@ return function ($app): void {
         '/v1/officer/reports' => ROUTE . 'v1/OfficerReportsRoute.php',
         '/v1/officer' => ROUTE . 'v1/OfficerRoute.php',
         '/v1/agent/dashboard' => ROUTE . 'v1/DashboardRoute.php',
+        '/v1/agent/issues' => ROUTE . 'v1/IssueReportRoute.php',
         '/v1/agent' => ROUTE . 'v1/AgentRoute.php',
         '/v1/task-force/dashboard' => ROUTE . 'v1/DashboardRoute.php',
         '/v1/task-force' => ROUTE . 'v1/TaskForceRoute.php',

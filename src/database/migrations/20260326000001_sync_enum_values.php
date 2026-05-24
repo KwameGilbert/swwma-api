@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use Phinx\Migration\AbstractMigration;
 
-final class SyncEnumValuesInIssueReports extends AbstractMigration
+final class SyncEnumValues extends AbstractMigration
 {
     /**
      * Change Method.

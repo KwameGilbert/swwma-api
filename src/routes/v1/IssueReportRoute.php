@@ -25,6 +25,7 @@ return function (App $app) {
     // Agent routes (require agent role)
     $app->group('/v1/agent/issues', function ($group) use ($controller) {
         $group->post('', [$controller, 'agentSubmit']);
+        $group->get('/{id}', [$controller, 'agentShow']);
         $group->put('/{id}', [$controller, 'agentUpdate']);
         $group->delete('/{id}', [$controller, 'agentDelete']);
     })->add(new RoleMiddleware(['agent']))->add($authMiddleware);

@@ -753,6 +753,51 @@ class IssueReportController
     }
 
     /**
+     * Agent view single issue report
+     * GET /api/agent/issues/{id}
+     */
+    public function agentShow(Request $request, Response $response, array $args): Response
+    {
+        try {
+            $user = $request->getAttribute('user');
+            $agent = Agent::findByUserId($user->id);
+
+            if (!$agent) {
+                return ResponseHelper::error($response, 'Agent profile not found', 404);
+            }
+
+            $report = IssueReport::with([
+                'assignedOfficer.user',
+                'assignedAgent.user',
+                'submittedByAgent.user',
+                'comments.user',
+                'statusHistory.changedByUser',
+                'assessmentReport',
+                'resolutionReport',
+                'sector',
+                'subSector',
+                'mainCommunity',
+                'smallerCommunity',
+                'suburb',
+                'cottage',
+            ])
+            ->where('id', $args['id'])
+            ->where('submitted_by_agent_id', $agent->id)
+            ->first();
+
+            if (!$report) {
+                return ResponseHelper::error($response, 'Issue report not found or access denied', 404);
+            }
+
+            return ResponseHelper::success($response, 'Issue report fetched successfully', [
+                'report' => $report->toFullArray()
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch issue report', 500, $e->getMessage());
+        }
+    }
+
+    /**
      * Officer submit issue report
      * POST /api/officer/issues
      */
@@ -944,9 +989,12 @@ class IssueReportController
             // Actually, let's check ownership via report's relationship or a field. 
             // Assuming strict check is okay for now or just allow if in valid status and agent role.
             
-            // To be safe, I'll allow based on status for now, assuming agents see their own reports.
-            
-            if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_PENDING, IssueReport::STATUS_REJECTED])) {
+            // Strict ownership check for agents
+            if ($report->submitted_by_agent_id !== $agent->id) {
+                return ResponseHelper::error($response, 'Access denied: You can only edit your own reports', 403);
+            }
+
+            if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_REJECTED])) {
                 return ResponseHelper::error($response, 'Cannot edit issue in current status', 400); 
             }
 
@@ -1014,9 +1062,11 @@ class IssueReportController
             }
 
             // Agents can only delete their own issues in early stages
-            // Assuming agents only see their own issues via `getMyReports` logic anyway.
+            if ($report->submitted_by_agent_id !== $agent->id) {
+                return ResponseHelper::error($response, 'Access denied: You can only delete your own reports', 403);
+            }
             
-            if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_PENDING, IssueReport::STATUS_REJECTED])) {
+            if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_REJECTED])) {
                 return ResponseHelper::error($response, 'Cannot delete issue that has been processed', 400); 
             }
 

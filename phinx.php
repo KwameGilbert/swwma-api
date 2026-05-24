@@ -6,7 +6,7 @@ use Dotenv\Dotenv;
 
 // Load environment variables
 $dotenv = Dotenv::createImmutable(__DIR__);
-$dotenv->load();
+$dotenv->safeLoad();
 
 // Check environment - default to local if not specified
 $env = isset($_ENV['APP_ENV']) ? $_ENV['APP_ENV'] : 'development';
