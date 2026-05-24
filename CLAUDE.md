@@ -88,7 +88,7 @@ Based on the frontend's `api_specifications.json` and typical patterns:
 - Environment-based configuration
 
 ## Integration with Frontend
-- API base URL configured in frontend via `NEXT_PUBLIC_APP_URL` or similar
+- API base URL configured in frontend via `NEXT_PUBLIC_SITE_URL` or similar
 - JSON responses standardized
 - Authentication via JWT tokens in Authorization header or cookies
 - CORS configured to allow frontend domain
