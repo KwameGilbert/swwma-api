@@ -607,12 +607,13 @@ class ConstituencyDataSeeder extends AbstractSeed
         ];
 
         foreach ($subSectors as $sub) {
+            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9]+/', '-', $sub[2]), '-')) . '-' . $sub[0];
             $this->execute(sprintf(
-                "INSERT INTO sub_sectors (id, sector_id, name, description, status, created_at, updated_at) 
-                 VALUES (%d, %d, '%s', %s, '%s', NOW(), NOW()) 
-                 ON DUPLICATE KEY UPDATE sector_id=%d, name='%s', description=%s, status='%s', updated_at=NOW()",
-                $sub[0], $sub[1], addslashes($sub[2]), ($sub[3] === NULL ? 'NULL' : "'".addslashes($sub[3])."'"), $sub[4],
-                $sub[1], addslashes($sub[2]), ($sub[3] === NULL ? 'NULL' : "'".addslashes($sub[3])."'"), $sub[4]
+                "INSERT INTO sub_sectors (id, sector_id, name, slug, description, status, created_at, updated_at) 
+                 VALUES (%d, %d, '%s', '%s', %s, '%s', NOW(), NOW()) 
+                 ON DUPLICATE KEY UPDATE sector_id=%d, name='%s', slug='%s', description=%s, status='%s', updated_at=NOW()",
+                $sub[0], $sub[1], addslashes($sub[2]), $slug, ($sub[3] === NULL ? 'NULL' : "'".addslashes($sub[3])."'"), $sub[4],
+                $sub[1], addslashes($sub[2]), $slug, ($sub[3] === NULL ? 'NULL' : "'".addslashes($sub[3])."'"), $sub[4]
             ));
         }
 

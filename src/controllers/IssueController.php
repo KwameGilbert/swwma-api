@@ -157,7 +157,7 @@ class IssueController
                 'description' => $data['description'],
                 'category_id' => $data['category_id'],
                 'sector_id' => $data['sector_id'],
-                'sub_sector_id' => $data['sub_sector_id'],
+                'sub_sector_id' => isset($data['sub_sector_id']) && $data['sub_sector_id'] !== '' ? (int)$data['sub_sector_id'] : null,
                 'community_id' => $data['community_id'],
                 'suburb_id' => $data['suburb_id'] ?? null,
                 'specific_location' => $data['specific_location'] ?? null,
@@ -216,6 +216,13 @@ class IssueController
                 'status', 'priority', 'images', 'agent_id', 'people_affected'
             ];
             $updateData = array_intersect_key($data, array_flip($allowed));
+            
+            if (isset($updateData['sub_sector_id']) && $updateData['sub_sector_id'] === '') {
+                $updateData['sub_sector_id'] = null;
+            }
+            if (isset($updateData['suburb_id']) && $updateData['suburb_id'] === '') {
+                $updateData['suburb_id'] = null;
+            }
 
             // Handle Image Uploads for Update
             $uploadedFiles = $request->getUploadedFiles();

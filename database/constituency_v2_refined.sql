@@ -191,7 +191,7 @@ CREATE TABLE `issues` (
   `description` text NOT NULL,
   `category_id` int(11) UNSIGNED NOT NULL,
   `sector_id` int(11) UNSIGNED NOT NULL,
-  `sub_sector_id` int(11) UNSIGNED NOT NULL,
+  `sub_sector_id` int(11) UNSIGNED DEFAULT NULL,
   `community_id` int(11) UNSIGNED NOT NULL,
   `suburb_id` int(11) UNSIGNED DEFAULT NULL,
   `specific_location` varchar(255) DEFAULT NULL,
