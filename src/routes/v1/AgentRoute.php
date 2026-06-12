@@ -24,6 +24,7 @@ return function (App $app) {
         $group->put('/profile', [$controller, 'updateProfile']);
         $group->put('/password', [$controller, 'changePassword']);
         $group->get('/my-reports', [$controller, 'myReports']);
+        $group->get('/stats', [$controller, 'getStats']);
     })->add(new RoleMiddleware(['agent', 'web_admin', 'admin', 'officer']))->add($authMiddleware);
 
     // Admin routes (require web_admin or officer role)

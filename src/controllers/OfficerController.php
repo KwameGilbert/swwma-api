@@ -295,6 +295,89 @@ class OfficerController
     }
 
     /**
+     * Get all agents for officer management
+     * GET /v1/officer/management/agents
+     */
+    public function getManagementAgents(Request $request, Response $response): Response
+    {
+        try {
+            $user = $request->getAttribute('user');
+            $officer = Officer::findByUserId($user->id);
+
+            if (!$officer) {
+                return ResponseHelper::error($response, 'Officer profile not found', 404);
+            }
+
+            $params = $request->getQueryParams();
+            $status = $params['status'] ?? null;
+
+            $query = $officer->supervisedAgents()->with('user');
+
+            if ($status) {
+                $query->whereHas('user', function($q) use ($status) {
+                    $q->where('status', $status);
+                });
+            }
+
+            $agents = $query->get();
+
+            return ResponseHelper::success($response, 'Agents fetched successfully', [
+                'agents' => $agents->map(fn($a) => $a->getFullProfile())->toArray()
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch management agents', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Get agent statistics for officer
+     * GET /v1/officer/management/agents/stats
+     */
+    public function getAgentStats(Request $request, Response $response): Response
+    {
+        try {
+            $user = $request->getAttribute('user');
+            $officer = Officer::findByUserId($user->id);
+
+            if (!$officer) {
+                return ResponseHelper::error($response, 'Officer profile not found', 404);
+            }
+
+            $supervisedAgentIds = $officer->supervisedAgents()->pluck('id')->toArray();
+
+            if (empty($supervisedAgentIds)) {
+                return ResponseHelper::success($response, 'Statistics fetched successfully', [
+                    'total_agents' => 0,
+                    'active_agents' => 0,
+                    'inactive_agents' => 0,
+                    'issues_handled' => 0
+                ]);
+            }
+
+            $totalAgents = count($supervisedAgentIds);
+
+            $activeAgents = \App\Models\Agent::whereIn('id', $supervisedAgentIds)
+                ->whereHas('user', function ($q) {
+                    $q->where('status', 'active');
+                })->count();
+
+            $inactiveAgents = $totalAgents - $activeAgents;
+
+            $issuesHandled = \App\Models\Agent::whereIn('id', $supervisedAgentIds)
+                ->sum('reports_submitted');
+
+            return ResponseHelper::success($response, 'Statistics fetched successfully', [
+                'total_agents' => $totalAgents,
+                'active_agents' => $activeAgents,
+                'inactive_agents' => $inactiveAgents,
+                'issues_handled' => (int) $issuesHandled
+            ]);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch agent statistics', 500, $e->getMessage());
+        }
+    }
+
+    /**
      * Generate random password
      */
     private function generatePassword(int $length = 12): string

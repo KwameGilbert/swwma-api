@@ -412,7 +412,8 @@ class IssueReportController
             $reportArray['reporter_address'] = $report->constituent_address ?? ($reportArray['reporter_address'] ?? null);
 
             return ResponseHelper::success($response, 'Issue report fetched successfully', [
-                'report' => $reportArray
+                'report' => $reportArray,
+                'issue' => $reportArray
             ]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch issue report', 500, $e->getMessage());
@@ -745,7 +746,8 @@ class IssueReportController
             );
 
             return ResponseHelper::success($response, 'Issue report submitted successfully', [
-                'report' => $report->toPublicArray()
+                'report' => $report->toPublicArray(),
+                'issue' => $report->toPublicArray()
             ], 201);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to submit issue report', 500, $e->getMessage());
@@ -790,7 +792,8 @@ class IssueReportController
             }
 
             return ResponseHelper::success($response, 'Issue report fetched successfully', [
-                'report' => $report->toFullArray()
+                'report' => $report->toFullArray(),
+                'issue' => $report->toFullArray()
             ]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch issue report', 500, $e->getMessage());

@@ -22,6 +22,8 @@ return function (App $app) {
     $app->group('/v1/officer', function ($group) use ($controller) {
         $group->get('/reports', [$controller, 'myReports']);
         $group->get('/agents', [$controller, 'myAgents']);
+        $group->get('/management/agents', [$controller, 'getManagementAgents']);
+        $group->get('/management/agents/stats', [$controller, 'getAgentStats']);
     })->add(new RoleMiddleware(['officer']))->add($authMiddleware);
 
     // Admin routes (require web_admin role)

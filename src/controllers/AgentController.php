@@ -717,6 +717,78 @@ class AgentController
      * Keep only columns that exist in the current DB schema.
      * This supports both legacy and migrated issue_reports tables.
      */
+    /**
+     * Get agent's dashboard stats
+     * GET /v1/agent/stats
+     */
+    public function getStats(Request $request, Response $response): Response
+    {
+        try {
+            $user = $request->getAttribute('user');
+            $agent = Agent::findByUserId($user->id);
+
+            if (!$agent) {
+                return ResponseHelper::error($response, 'Agent profile not found', 404);
+            }
+
+            // Fetch count of submitted reports grouped by status
+            $reportsQuery = $agent->submittedReports();
+            $reports = $reportsQuery->get(['status']);
+
+            $total = count($reports);
+            $pending = 0;
+            $approved = 0;
+            $inProgress = 0;
+            $resolved = 0;
+            $rejected = 0;
+
+            foreach ($reports as $report) {
+                $status = strtolower($report->status ?? '');
+                
+                if (
+                    $status === 'submitted' ||
+                    $status === 'pending' ||
+                    $status === 'under_officer_review'
+                ) {
+                    $pending++;
+                } elseif (
+                    $status === 'forwarded_to_admin' ||
+                    $status === 'approved' ||
+                    $status === 'assigned_to_task_force'
+                ) {
+                    $approved++;
+                } elseif (
+                    $status === 'pending_assessment' ||
+                    $status === 'assessment_in_progress' ||
+                    $status === 'assessment_submitted' ||
+                    $status === 'resources_allocated' ||
+                    $status === 'resolution_in_progress' ||
+                    $status === 'resolution_submitted' ||
+                    $status === 'in_progress'
+                ) {
+                    $inProgress++;
+                } elseif ($status === 'resolved' || $status === 'closed') {
+                    $resolved++;
+                } elseif ($status === 'rejected') {
+                    $rejected++;
+                }
+            }
+
+            $stats = [
+                'total' => $total,
+                'pending' => $pending,
+                'approved' => $approved,
+                'inProgress' => $inProgress,
+                'resolved' => $resolved,
+                'rejected' => $rejected,
+            ];
+
+            return ResponseHelper::success($response, 'Agent statistics fetched successfully', $stats);
+        } catch (Exception $e) {
+            return ResponseHelper::error($response, 'Failed to fetch agent statistics', 500, $e->getMessage());
+        }
+    }
+
     private function filterIssueReportPayload(array $payload): array
     {
         static $columns = null;
