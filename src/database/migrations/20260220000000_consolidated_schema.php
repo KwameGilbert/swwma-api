@@ -761,10 +761,14 @@ final class ConsolidatedSchema extends AbstractMigration
         $reports->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
             ->addColumn('report_code', 'string', ['limit' => 50, 'null' => false])
             ->addColumn('user_id', 'integer', ['null' => true, 'signed' => false])
-            ->addColumn('agent_id', 'integer', ['null' => true, 'signed' => false])
-            ->addColumn('officer_id', 'integer', ['null' => true, 'signed' => false])
-            ->addColumn('task_force_id', 'integer', ['null' => true, 'signed' => false])
-            ->addColumn('sub_sector_id', 'integer', ['null' => false, 'signed' => false])
+            ->addColumn('submitted_by_agent_id', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('submitted_by_officer_id', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('assigned_officer_id', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('assigned_agent_id', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('assigned_task_force_id', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('sector_id', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('sub_sector_id', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('category', 'string', ['limit' => 100, 'null' => true])
             ->addColumn('title', 'string', ['limit' => 255, 'null' => false])
             ->addColumn('description', 'text', ['null' => false])
             ->addColumn('location_name', 'string', ['limit' => 255, 'null' => false])
@@ -780,6 +784,13 @@ final class ConsolidatedSchema extends AbstractMigration
             ->addColumn('videos', 'json', ['null' => true])
             ->addColumn('is_public', 'boolean', ['default' => true, 'null' => false])
             ->addColumn('anonymous', 'boolean', ['default' => false, 'null' => false])
+            ->addColumn('acknowledged_at', 'timestamp', ['null' => true])
+            ->addColumn('acknowledged_by', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('forwarded_to_admin_at', 'timestamp', ['null' => true])
+            ->addColumn('assigned_to_task_force_at', 'timestamp', ['null' => true])
+            ->addColumn('resources_allocated_at', 'timestamp', ['null' => true])
+            ->addColumn('resources_allocated_by', 'integer', ['null' => true, 'signed' => false])
+            ->addColumn('resolved_by', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('reported_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => true])
             ->addColumn('resolved_at', 'timestamp', ['null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => true])
@@ -787,10 +798,16 @@ final class ConsolidatedSchema extends AbstractMigration
             ->addIndex(['report_code'], ['unique' => true])
             ->addIndex(['status'])->addIndex(['severity'])
             ->addForeignKey('user_id', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
-            ->addForeignKey('agent_id', 'agents', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
-            ->addForeignKey('officer_id', 'officers', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
-            ->addForeignKey('task_force_id', 'task_force_members', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
-            ->addForeignKey('sub_sector_id', 'sub_sectors', 'id', ['delete' => 'NO_ACTION', 'update' => 'CASCADE']);
+            ->addForeignKey('submitted_by_agent_id', 'agents', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('submitted_by_officer_id', 'officers', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('assigned_officer_id', 'officers', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('assigned_agent_id', 'agents', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('assigned_task_force_id', 'task_force_members', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('sector_id', 'sectors', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('sub_sector_id', 'sub_sectors', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('acknowledged_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('resources_allocated_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('resolved_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE']);
 
         if (!$this->hasTable('issue_reports')) {
             $reports->create();
@@ -801,14 +818,14 @@ final class ConsolidatedSchema extends AbstractMigration
         // 30. ISSUE REPORT COMMENTS
         $comments = $this->table('issue_report_comments', ['id' => false, 'primary_key' => ['id']]);
         $comments->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-            ->addColumn('report_id', 'integer', ['null' => false, 'signed' => false])
+            ->addColumn('issue_report_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('user_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('comment', 'text', ['null' => false])
             ->addColumn('is_internal', 'boolean', ['default' => false, 'null' => false])
             ->addColumn('attachments', 'json', ['null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => true])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP', 'null' => true])
-            ->addForeignKey('report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('issue_report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE']);
 
         if (!$this->hasTable('issue_report_comments')) {
@@ -820,13 +837,13 @@ final class ConsolidatedSchema extends AbstractMigration
         // 31. ISSUE REPORT STATUS HISTORY
         $history = $this->table('issue_report_status_history', ['id' => false, 'primary_key' => ['id']]);
         $history->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-            ->addColumn('report_id', 'integer', ['null' => false, 'signed' => false])
+            ->addColumn('issue_report_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('user_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('previous_status', 'string', ['limit' => 50, 'null' => true])
             ->addColumn('new_status', 'string', ['limit' => 50, 'null' => false])
             ->addColumn('comment', 'text', ['null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => true])
-            ->addForeignKey('report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('issue_report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE']);
 
         if (!$this->hasTable('issue_report_status_history')) {
@@ -838,7 +855,7 @@ final class ConsolidatedSchema extends AbstractMigration
         // 32. ISSUE ASSESSMENT REPORTS
         $assessments = $this->table('issue_assessment_reports', ['id' => false, 'primary_key' => ['id']]);
         $assessments->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-            ->addColumn('report_id', 'integer', ['null' => false, 'signed' => false])
+            ->addColumn('issue_report_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('assessed_by', 'integer', ['null' => false, 'signed' => false, 'comment' => 'Task Force Member ID'])
             ->addColumn('actual_severity', 'enum', ['values' => ['low', 'medium', 'high', 'critical'], 'null' => false])
             ->addColumn('root_cause', 'text', ['null' => true])
@@ -850,7 +867,7 @@ final class ConsolidatedSchema extends AbstractMigration
             ->addColumn('images', 'json', ['null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => true])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP', 'null' => true])
-            ->addForeignKey('report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('issue_report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('assessed_by', 'task_force_members', 'id', ['delete' => 'NO_ACTION', 'update' => 'CASCADE']);
 
         if (!$this->hasTable('issue_assessment_reports')) {
@@ -862,7 +879,7 @@ final class ConsolidatedSchema extends AbstractMigration
         // 33. ISSUE RESOLUTION REPORTS
         $resolutions = $this->table('issue_resolution_reports', ['id' => false, 'primary_key' => ['id']]);
         $resolutions->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-            ->addColumn('report_id', 'integer', ['null' => false, 'signed' => false])
+            ->addColumn('issue_report_id', 'integer', ['null' => false, 'signed' => false])
             ->addColumn('resolved_by', 'integer', ['null' => false, 'signed' => false, 'comment' => 'Task Force Member ID'])
             ->addColumn('resolution_details', 'text', ['null' => false])
             ->addColumn('actual_cost', 'decimal', ['precision' => 15, 'scale' => 2, 'null' => true])
@@ -872,7 +889,7 @@ final class ConsolidatedSchema extends AbstractMigration
             ->addColumn('completion_date', 'timestamp', ['null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => true])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP', 'null' => true])
-            ->addForeignKey('report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
+            ->addForeignKey('issue_report_id', 'issue_reports', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('resolved_by', 'task_force_members', 'id', ['delete' => 'NO_ACTION', 'update' => 'CASCADE']);
 
         if (!$this->hasTable('issue_resolution_reports')) {
@@ -935,21 +952,45 @@ final class ConsolidatedSchema extends AbstractMigration
         // 36. YOUTH RECORDS
         $youthRecords = $this->table('youth_records', ['id' => false, 'primary_key' => ['id']]);
         $youthRecords->addColumn('id', 'integer', ['identity' => true, 'signed' => false])
-            ->addColumn('user_id', 'integer', ['null' => false, 'signed' => false])
+            ->addColumn('full_name', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('date_of_birth', 'date', ['null' => true])
+            ->addColumn('gender', 'enum', ['values' => ['male', 'female', 'other'], 'null' => true])
             ->addColumn('national_id', 'string', ['limit' => 50, 'null' => true])
-            ->addColumn('date_of_birth', 'date', ['null' => false])
-            ->addColumn('gender', 'enum', ['values' => ['male', 'female', 'other'], 'null' => false])
-            ->addColumn('educational_level', 'string', ['limit' => 100, 'null' => true])
-            ->addColumn('employment_status', 'enum', ['values' => ['student', 'employed', 'unemployed', 'self_employed'], 'null' => true])
-            ->addColumn('skills', 'json', ['null' => true])
-            ->addColumn('interests', 'json', ['null' => true])
+            ->addColumn('phone', 'string', ['limit' => 20, 'null' => true])
+            ->addColumn('email', 'string', ['limit' => 100, 'null' => true])
+            ->addColumn('hometown', 'string', ['limit' => 100, 'null' => true])
+            ->addColumn('community', 'string', ['limit' => 100, 'null' => true])
             ->addColumn('location_id', 'integer', ['null' => true, 'signed' => false])
-            ->addColumn('address', 'text', ['null' => true])
+            ->addColumn('education_level', 'string', ['limit' => 50, 'null' => true])
+            ->addColumn('jhs_completed', 'boolean', ['default' => false, 'null' => false])
+            ->addColumn('shs_qualification', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('certificate_qualification', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('diploma_qualification', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('degree_qualification', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('postgraduate_qualification', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('professional_qualification', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('employment_status', 'enum', ['values' => ['employed', 'unemployed', 'student', 'self_employed'], 'default' => 'unemployed', 'null' => true])
+            ->addColumn('availability_status', 'enum', ['values' => ['available', 'unavailable'], 'default' => 'available', 'null' => true])
+            ->addColumn('current_employment', 'string', ['limit' => 300, 'null' => true])
+            ->addColumn('preferred_location', 'string', ['limit' => 200, 'null' => true])
+            ->addColumn('salary_expectation', 'decimal', ['precision' => 10, 'scale' => 2, 'null' => true])
+            ->addColumn('employment_notes', 'text', ['null' => true])
+            ->addColumn('work_experiences', 'json', ['null' => true])
+            ->addColumn('skills', 'text', ['null' => true])
+            ->addColumn('interests', 'text', ['null' => true])
+            ->addColumn('status', 'enum', ['values' => ['pending', 'approved', 'rejected'], 'default' => 'pending', 'null' => true])
+            ->addColumn('admin_notes', 'text', ['null' => true])
+            ->addColumn('created_by', 'integer', ['null' => true, 'signed' => false])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'null' => true])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP', 'null' => true])
-            ->addIndex(['user_id'], ['unique' => true])
-            ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
-            ->addForeignKey('location_id', 'locations', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE']);
+            ->addIndex(['status'])
+            ->addIndex(['employment_status'])
+            ->addIndex(['location_id'])
+            ->addIndex(['created_at'])
+            ->addIndex(['full_name', 'phone'])
+            ->addIndex(['created_by'])
+            ->addForeignKey('location_id', 'locations', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('created_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE']);
 
         if (!$this->hasTable('youth_records')) {
             $youthRecords->create();

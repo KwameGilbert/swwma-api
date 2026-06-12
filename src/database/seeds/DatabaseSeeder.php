@@ -21,6 +21,7 @@ class DatabaseSeeder extends AbstractSeed
         $this->seedAgents();
         $this->seedTaskForceMembers();
         $this->seedSectors();
+        $this->seedSubSectors();
         $this->seedProjects();
         $this->seedBlogPosts();
         $this->seedEvents();
@@ -176,6 +177,53 @@ class DatabaseSeeder extends AbstractSeed
 
         $this->table('sectors')->insert($sectors)->saveData();
         echo "   ✓ Created " . count($sectors) . " sectors\n";
+    }
+
+    private function seedSubSectors(): void
+    {
+        echo "🌱 Seeding sub-sectors...\n";
+
+        $subSectors = [
+            // Infrastructure (Sector 1)
+            ['id' => 1, 'sector_id' => 1, 'name' => 'Public Buildings', 'code' => 'INF-PUB', 'description' => 'Construction and maintenance of public buildings', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 2, 'sector_id' => 1, 'name' => 'Drainage Systems', 'code' => 'INF-DRN', 'description' => 'Storm drains and gutters', 'display_order' => 2, 'status' => 'active'],
+            ['id' => 3, 'sector_id' => 1, 'name' => 'Markets', 'code' => 'INF-MKT', 'description' => 'Market stalls and structures', 'display_order' => 3, 'status' => 'active'],
+
+            // Healthcare (Sector 2)
+            ['id' => 4, 'sector_id' => 2, 'name' => 'Clinics & Hospitals', 'code' => 'HEA-CLN', 'description' => 'Health posts, clinics, and CHPS compounds', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 5, 'sector_id' => 2, 'name' => 'Medical Equipment', 'code' => 'HEA-EQP', 'description' => 'Supply of medical tools and instruments', 'display_order' => 2, 'status' => 'active'],
+
+            // Roads & Transport (Sector 3)
+            ['id' => 6, 'sector_id' => 3, 'name' => 'Road Rehabilitation', 'code' => 'RDS-REH', 'description' => 'Re-tarmacking and grading of roads', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 7, 'sector_id' => 3, 'name' => 'Pothole Repair', 'code' => 'RDS-PTH', 'description' => 'Fixing potholes and road surface damage', 'display_order' => 2, 'status' => 'active'],
+
+            // Education (Sector 4)
+            ['id' => 8, 'sector_id' => 4, 'name' => 'School Classrooms', 'code' => 'EDU-CLS', 'description' => 'Building and renovation of classroom blocks', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 9, 'sector_id' => 4, 'name' => 'Libraries & Labs', 'code' => 'EDU-LIB', 'description' => 'ICT centers, libraries, and laboratories', 'display_order' => 2, 'status' => 'active'],
+
+            // Water & Sanitation (Sector 5)
+            ['id' => 10, 'sector_id' => 5, 'name' => 'Water Supply', 'code' => 'WTR-SUP', 'description' => 'Boreholes, pipes, and clean water delivery', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 11, 'sector_id' => 5, 'name' => 'Sanitation Facilities', 'code' => 'WTR-SAN', 'description' => 'Public toilets and waste disposal sites', 'display_order' => 2, 'status' => 'active'],
+            ['id' => 12, 'sector_id' => 5, 'name' => 'Environmental Management', 'code' => 'WTR-ENV', 'description' => 'Clearance of weeds, bushes, and environmental care', 'display_order' => 3, 'status' => 'active'],
+
+            // Agriculture (Sector 6)
+            ['id' => 13, 'sector_id' => 6, 'name' => 'Farming Support', 'code' => 'AGR-SUP', 'description' => 'Seeds, fertilizers, and extension services', 'display_order' => 1, 'status' => 'active'],
+            
+            // Youth & Sports (Sector 7)
+            ['id' => 14, 'sector_id' => 7, 'name' => 'Sports Facilities', 'code' => 'YTH-SPT', 'description' => 'Pitches, courts, and sporting complexes', 'display_order' => 1, 'status' => 'active'],
+            
+            // Electricity (Sector 8)
+            ['id' => 15, 'sector_id' => 8, 'name' => 'Street Lighting', 'code' => 'ELC-LGT', 'description' => 'Installation and repair of street lights', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 16, 'sector_id' => 8, 'name' => 'Grid Extension', 'code' => 'ELC-GRD', 'description' => 'Connecting communities to power grid', 'display_order' => 2, 'status' => 'active'],
+        ];
+
+        foreach ($subSectors as &$sub) {
+            $sub['created_at'] = date('Y-m-d H:i:s');
+            $sub['updated_at'] = date('Y-m-d H:i:s');
+        }
+
+        $this->table('sub_sectors')->insert($subSectors)->saveData();
+        echo "   ✓ Created " . count($subSectors) . " sub-sectors\n";
     }
 
     private function seedProjects(): void
@@ -339,12 +387,12 @@ class DatabaseSeeder extends AbstractSeed
         echo "🚨 Seeding issue reports...\n";
 
         $issues = [
-            ['case_id' => 'ISS-2025-0001', 'title' => 'Pothole on Main Street Adum', 'description' => 'Large pothole causing traffic hazards and vehicle damage near the central market.', 'category' => 'Roads', 'location' => 'Main Street, Adum', 'latitude' => 6.6885, 'longitude' => -1.6244, 'reporter_name' => 'Kofi Ansah', 'reporter_email' => 'kofi.ansah@email.com', 'reporter_phone' => '+233241234567', 'status' => 'resolved', 'priority' => 'high', 'resolution_notes' => 'Pothole filled and road surface repaired by maintenance team.', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-25 days')), 'resolved_at' => date('Y-m-d H:i:s', strtotime('-20 days')), 'submitted_by_agent_id' => 1, 'assigned_officer_id' => 1],
-            ['case_id' => 'ISS-2025-0002', 'title' => 'Broken Street Light', 'description' => 'Street light not working for two weeks creating safety concerns at night.', 'category' => 'Electricity', 'location' => 'Station Road, Bantama', 'latitude' => 6.7012, 'longitude' => -1.6189, 'reporter_name' => 'Ama Serwaa', 'reporter_email' => 'ama.serwaa@email.com', 'reporter_phone' => '+233242345678', 'status' => 'in_progress', 'priority' => 'medium', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-5 days')), 'submitted_by_agent_id' => 2, 'assigned_officer_id' => 1],
-            ['case_id' => 'ISS-2025-0003', 'title' => 'Blocked Drainage Channel', 'description' => 'Drainage blocked with refuse causing flooding during rains.', 'category' => 'Drainage', 'location' => 'Market Square, Asafo', 'latitude' => 6.6823, 'longitude' => -1.6112, 'reporter_name' => 'Yaw Mensah', 'reporter_email' => 'yaw.mensah@email.com', 'reporter_phone' => '+233243456789', 'status' => 'acknowledged', 'priority' => 'urgent', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-2 days')), 'submitted_by_agent_id' => 3, 'assigned_officer_id' => 1, 'assigned_task_force_id' => 1],
-            ['case_id' => 'ISS-2025-0004', 'title' => 'Water Supply Interruption', 'description' => 'No water supply for the past week affecting over 50 households.', 'category' => 'Water', 'location' => 'Nhyiaeso East', 'latitude' => 6.6756, 'longitude' => -1.6278, 'reporter_name' => 'Akua Boateng', 'reporter_email' => 'akua.boateng@email.com', 'reporter_phone' => '+233244567890', 'status' => 'in_progress', 'priority' => 'high', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-10 days')), 'submitted_by_agent_id' => 4, 'assigned_officer_id' => 2, 'assigned_task_force_id' => 2],
-            ['case_id' => 'ISS-2025-0005', 'title' => 'Damaged School Roof', 'description' => 'School roof damaged by recent storm, rainwater entering classrooms.', 'category' => 'Education', 'location' => 'Subin Primary School', 'latitude' => 6.6934, 'longitude' => -1.6156, 'reporter_name' => 'Mr. John Osei', 'reporter_email' => 'john.osei@school.edu.gh', 'reporter_phone' => '+233245678901', 'status' => 'submitted', 'priority' => 'high'],
-            ['case_id' => 'ISS-2025-0006', 'title' => 'Overgrown Vegetation Near Road', 'description' => 'Tall grass and bushes obstructing visibility at road junction.', 'category' => 'Environment', 'location' => 'Tafo Junction', 'latitude' => 6.7089, 'longitude' => -1.6045, 'reporter_name' => 'Kwame Adjei', 'reporter_email' => 'kwame.adjei@email.com', 'reporter_phone' => '+233246789012', 'status' => 'resolved', 'priority' => 'medium', 'resolution_notes' => 'Area cleared by sanitation team.', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-15 days')), 'resolved_at' => date('Y-m-d H:i:s', strtotime('-12 days')), 'assigned_officer_id' => 4],
+            ['case_id' => 'ISS-2025-0001', 'title' => 'Pothole on Main Street Adum', 'description' => 'Large pothole causing traffic hazards and vehicle damage near the central market.', 'category' => 'Roads', 'sector_id' => 3, 'sub_sector_id' => 7, 'location' => 'Main Street, Adum', 'latitude' => 6.6885, 'longitude' => -1.6244, 'reporter_name' => 'Kofi Ansah', 'reporter_email' => 'kofi.ansah@email.com', 'reporter_phone' => '+233241234567', 'status' => 'resolved', 'priority' => 'high', 'resolution_notes' => 'Pothole filled and road surface repaired by maintenance team.', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-25 days')), 'resolved_at' => date('Y-m-d H:i:s', strtotime('-20 days')), 'submitted_by_agent_id' => 1, 'assigned_officer_id' => 1],
+            ['case_id' => 'ISS-2025-0002', 'title' => 'Broken Street Light', 'description' => 'Street light not working for two weeks creating safety concerns at night.', 'category' => 'Electricity', 'sector_id' => 8, 'sub_sector_id' => 15, 'location' => 'Station Road, Bantama', 'latitude' => 6.7012, 'longitude' => -1.6189, 'reporter_name' => 'Ama Serwaa', 'reporter_email' => 'ama.serwaa@email.com', 'reporter_phone' => '+233242345678', 'status' => 'in_progress', 'priority' => 'medium', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-5 days')), 'submitted_by_agent_id' => 2, 'assigned_officer_id' => 1],
+            ['case_id' => 'ISS-2025-0003', 'title' => 'Blocked Drainage Channel', 'description' => 'Drainage blocked with refuse causing flooding during rains.', 'category' => 'Drainage', 'sector_id' => 1, 'sub_sector_id' => 2, 'location' => 'Market Square, Asafo', 'latitude' => 6.6823, 'longitude' => -1.6112, 'reporter_name' => 'Yaw Mensah', 'reporter_email' => 'yaw.mensah@email.com', 'reporter_phone' => '+233243456789', 'status' => 'acknowledged', 'priority' => 'urgent', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-2 days')), 'submitted_by_agent_id' => 3, 'assigned_officer_id' => 1, 'assigned_task_force_id' => 1],
+            ['case_id' => 'ISS-2025-0004', 'title' => 'Water Supply Interruption', 'description' => 'No water supply for the past week affecting over 50 households.', 'category' => 'Water', 'sector_id' => 5, 'sub_sector_id' => 10, 'location' => 'Nhyiaeso East', 'latitude' => 6.6756, 'longitude' => -1.6278, 'reporter_name' => 'Akua Boateng', 'reporter_email' => 'akua.boateng@email.com', 'reporter_phone' => '+233244567890', 'status' => 'in_progress', 'priority' => 'high', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-10 days')), 'submitted_by_agent_id' => 4, 'assigned_officer_id' => 2, 'assigned_task_force_id' => 2],
+            ['case_id' => 'ISS-2025-0005', 'title' => 'Damaged School Roof', 'description' => 'School roof damaged by recent storm, rainwater entering classrooms.', 'category' => 'Education', 'sector_id' => 4, 'sub_sector_id' => 8, 'location' => 'Subin Primary School', 'latitude' => 6.6934, 'longitude' => -1.6156, 'reporter_name' => 'Mr. John Osei', 'reporter_email' => 'john.osei@school.edu.gh', 'reporter_phone' => '+233245678901', 'status' => 'submitted', 'priority' => 'high'],
+            ['case_id' => 'ISS-2025-0006', 'title' => 'Overgrown Vegetation Near Road', 'description' => 'Tall grass and bushes obstructing visibility at road junction.', 'category' => 'Environment', 'sector_id' => 5, 'sub_sector_id' => 12, 'location' => 'Tafo Junction', 'latitude' => 6.7089, 'longitude' => -1.6045, 'reporter_name' => 'Kwame Adjei', 'reporter_email' => 'kwame.adjei@email.com', 'reporter_phone' => '+233246789012', 'status' => 'resolved', 'priority' => 'medium', 'resolution_notes' => 'Area cleared by sanitation team.', 'acknowledged_at' => date('Y-m-d H:i:s', strtotime('-15 days')), 'resolved_at' => date('Y-m-d H:i:s', strtotime('-12 days')), 'assigned_officer_id' => 4],
         ];
 
         foreach ($issues as &$issue) {
