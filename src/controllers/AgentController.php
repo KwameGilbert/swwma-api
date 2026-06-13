@@ -202,9 +202,27 @@ class AgentController
                 return ResponseHelper::error($response, 'Agent code already exists', 400);
             }
 
+            $supervisorId = $data['supervisor_id'] ?? null;
+            if (!$supervisorId) {
+                $authUser = $request->getAttribute('user');
+                if ($authUser) {
+                    $authUserObj = is_array($authUser) ? (object)$authUser : $authUser;
+                    $authUserId = $authUserObj->id ?? null;
+                    if ($authUserId) {
+                        $dbUser = User::find($authUserId);
+                        if ($dbUser && $dbUser->role === User::ROLE_OFFICER) {
+                            $officer = Officer::findByUserId($dbUser->id);
+                            if ($officer) {
+                                $supervisorId = $officer->id;
+                            }
+                        }
+                    }
+                }
+            }
+
             $agentPayload = [
                 'user_id' => $user->id,
-                'supervisor_id' => $data['supervisor_id'] ?? null,
+                'supervisor_id' => $supervisorId,
                 'assigned_communities' => !empty($assignedCommunities) ? $assignedCommunities : null,
                 'assigned_location' => $data['assigned_location'] ?? null,
                 'can_submit_reports' => isset($data['can_submit_reports']) ? filter_var($data['can_submit_reports'], FILTER_VALIDATE_BOOLEAN) : true,
@@ -291,6 +309,15 @@ class AgentController
                 if (isset($data['name'])) $userData['name'] = $data['name'];
                 if (isset($data['phone'])) $userData['phone'] = $data['phone'];
                 if (isset($data['status'])) $userData['status'] = $data['status'];
+                if (!empty($data['password'])) {
+                    $userData['password'] = $this->authService->hashPassword($data['password']);
+                }
+                if (isset($data['email']) && $data['email'] !== $agent->user->email) {
+                    if (User::emailExists($data['email'], $agent->user->id)) {
+                        return ResponseHelper::error($response, 'Email is already in use by another account', 400);
+                    }
+                    $userData['email'] = $data['email'];
+                }
                 
                 if (!empty($userData)) {
                     $agent->user->update($userData);
