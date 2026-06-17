@@ -287,7 +287,14 @@ class OfficerController
             $agents = $officer->supervisedAgents()->with('user')->get();
 
             return ResponseHelper::success($response, 'Agents fetched successfully', [
-                'agents' => $agents->map(fn($a) => $a->getPublicProfile())->toArray()
+                'agents' => $agents->map(fn($a) => [
+                    'id' => $a->id,
+                    'name' => $a->user?->name,
+                    'email' => $a->user?->email,
+                    'phone' => $a->user?->phone,
+                    'agent_code' => $a->agent_code,
+                    'assigned_location' => $a->assigned_location,
+                ])->toArray()
             ]);
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to fetch agents', 500, $e->getMessage());

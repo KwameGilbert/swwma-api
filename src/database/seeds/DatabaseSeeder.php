@@ -20,6 +20,7 @@ class DatabaseSeeder extends AbstractSeed
         $this->seedOfficers();
         $this->seedAgents();
         $this->seedTaskForceMembers();
+        $this->seedCategories();
         $this->seedSectors();
         $this->seedSubSectors();
         $this->seedProjects();
@@ -155,19 +156,45 @@ class DatabaseSeeder extends AbstractSeed
         echo "   ✓ Created " . count($members) . " task force members\n";
     }
 
+    private function seedCategories(): void
+    {
+        echo "📁 Seeding categories...\n";
+
+        $categories = [
+            ['id' => 1, 'name' => 'WATER', 'slug' => 'water', 'description' => 'Water supply, infrastructure and flood control', 'icon' => 'droplet', 'color' => '#3B82F6', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 2, 'name' => 'ELECTRICITY', 'slug' => 'electricity', 'description' => 'Power supply, electrical infrastructure and street lighting', 'icon' => 'zap', 'color' => '#F59E0B', 'display_order' => 2, 'status' => 'active'],
+            ['id' => 3, 'name' => 'ROADS', 'slug' => 'roads', 'description' => 'Feeder roads, urban roads and transport structures', 'icon' => 'road', 'color' => '#6B7280', 'display_order' => 3, 'status' => 'active'],
+            ['id' => 4, 'name' => 'SANITATION', 'slug' => 'sanitation', 'description' => 'Waste management, drainage, sewage and public hygiene', 'icon' => 'trash-2', 'color' => '#10B981', 'display_order' => 4, 'status' => 'active'],
+            ['id' => 5, 'name' => 'HEALTH', 'slug' => 'health', 'description' => 'Health facilities, personnel, services and medical supplies', 'icon' => 'heart-pulse', 'color' => '#EF4444', 'display_order' => 5, 'status' => 'active'],
+            ['id' => 6, 'name' => 'EDUCATION', 'slug' => 'education', 'description' => 'School infrastructure, teaching, learning and welfare', 'icon' => 'graduation-cap', 'color' => '#8B5CF6', 'display_order' => 6, 'status' => 'active'],
+            ['id' => 7, 'name' => 'AGRICULTURE', 'slug' => 'agriculture', 'description' => 'Crop farming, livestock, fisheries and agricultural infrastructure', 'icon' => 'wheat', 'color' => '#22C55E', 'display_order' => 7, 'status' => 'active'],
+            ['id' => 8, 'name' => 'EMPLOYMENT', 'slug' => 'employment', 'description' => 'Unemployment, skills training and labour issues', 'icon' => 'briefcase', 'color' => '#0EA5E9', 'display_order' => 8, 'status' => 'active'],
+            ['id' => 9, 'name' => 'SOCIAL WELFARE ASSISTANCE', 'slug' => 'social-welfare-assistance', 'description' => 'Financial support, vulnerable groups and social protection', 'icon' => 'hand-helping', 'color' => '#EC4899', 'display_order' => 9, 'status' => 'active'],
+            ['id' => 10, 'name' => 'OTHER', 'slug' => 'other', 'description' => 'Security, land, housing, governance and civic issues', 'icon' => 'more-horizontal', 'color' => '#64748B', 'display_order' => 10, 'status' => 'active'],
+        ];
+
+        foreach ($categories as &$category) {
+            $category['created_at'] = date('Y-m-d H:i:s');
+            $category['updated_at'] = date('Y-m-d H:i:s');
+        }
+
+        $this->table('categories')->insert($categories)->saveData();
+        echo "   ✓ Created " . count($categories) . " categories\n";
+    }
+
     private function seedSectors(): void
     {
         echo "📊 Seeding sectors...\n";
 
         $sectors = [
-            ['name' => 'Infrastructure', 'slug' => 'infrastructure', 'description' => 'Roads, bridges, drainage systems, and public buildings development', 'icon' => 'building', 'color' => '#3B82F6', 'display_order' => 1, 'status' => 'active', 'created_by' => 1],
-            ['name' => 'Healthcare', 'slug' => 'healthcare', 'description' => 'Hospitals, clinics, medical equipment, and health programs', 'icon' => 'heart-pulse', 'color' => '#EF4444', 'display_order' => 2, 'status' => 'active', 'created_by' => 1],
-            ['name' => 'Roads & Transport', 'slug' => 'roads-transport', 'description' => 'Road construction, rehabilitation, and transport infrastructure', 'icon' => 'road', 'color' => '#F59E0B', 'display_order' => 3, 'status' => 'active', 'created_by' => 1],
-            ['name' => 'Education', 'slug' => 'education', 'description' => 'Schools, educational facilities, and learning programs', 'icon' => 'graduation-cap', 'color' => '#10B981', 'display_order' => 4, 'status' => 'active', 'created_by' => 1],
-            ['name' => 'Water & Sanitation', 'slug' => 'water-sanitation', 'description' => 'Clean water supply, sanitation facilities, and waste management', 'icon' => 'droplet', 'color' => '#06B6D4', 'display_order' => 5, 'status' => 'active', 'created_by' => 1],
-            ['name' => 'Agriculture', 'slug' => 'agriculture', 'description' => 'Farming support, irrigation systems, and agricultural development', 'icon' => 'wheat', 'color' => '#84CC16', 'display_order' => 6, 'status' => 'active', 'created_by' => 1],
-            ['name' => 'Youth & Sports', 'slug' => 'youth-sports', 'description' => 'Youth development programs, sports facilities, and recreational activities', 'icon' => 'users', 'color' => '#8B5CF6', 'display_order' => 7, 'status' => 'active', 'created_by' => 1],
-            ['name' => 'Electricity', 'slug' => 'electricity', 'description' => 'Power supply, electrical infrastructure, and rural electrification', 'icon' => 'zap', 'color' => '#FBBF24', 'display_order' => 8, 'status' => 'active', 'created_by' => 1],
+            ['id' => 1, 'category_id' => 10, 'name' => 'Infrastructure', 'slug' => 'infrastructure', 'description' => 'Roads, bridges, drainage systems, and public buildings development', 'icon' => 'building', 'color' => '#3B82F6', 'display_order' => 1, 'status' => 'active', 'created_by' => 1],
+            ['id' => 2, 'category_id' => 5, 'name' => 'Healthcare', 'slug' => 'healthcare', 'description' => 'Hospitals, clinics, medical equipment, and health programs', 'icon' => 'heart-pulse', 'color' => '#EF4444', 'display_order' => 2, 'status' => 'active', 'created_by' => 1],
+            ['id' => 3, 'category_id' => 3, 'name' => 'Roads & Transport', 'slug' => 'roads-transport', 'description' => 'Road construction, rehabilitation, and transport infrastructure', 'icon' => 'road', 'color' => '#F59E0B', 'display_order' => 3, 'status' => 'active', 'created_by' => 1],
+            ['id' => 4, 'category_id' => 6, 'name' => 'Education', 'slug' => 'education', 'description' => 'Schools, educational facilities, and learning programs', 'icon' => 'graduation-cap', 'color' => '#10B981', 'display_order' => 4, 'status' => 'active', 'created_by' => 1],
+            ['id' => 5, 'category_id' => 1, 'name' => 'Water & Sanitation', 'slug' => 'water-sanitation', 'description' => 'Clean water supply, sanitation facilities, and waste management', 'icon' => 'droplet', 'color' => '#06B6D4', 'display_order' => 5, 'status' => 'active', 'created_by' => 1],
+            ['id' => 6, 'category_id' => 7, 'name' => 'Agriculture', 'slug' => 'agriculture', 'description' => 'Farming support, irrigation systems, and agricultural development', 'icon' => 'wheat', 'color' => '#84CC16', 'display_order' => 6, 'status' => 'active', 'created_by' => 1],
+            ['id' => 7, 'category_id' => 10, 'name' => 'Youth & Sports', 'slug' => 'youth-sports', 'description' => 'Youth development programs, sports facilities, and recreational activities', 'icon' => 'users', 'color' => '#8B5CF6', 'display_order' => 7, 'status' => 'active', 'created_by' => 1],
+            ['id' => 8, 'category_id' => 2, 'name' => 'Electricity', 'slug' => 'electricity', 'description' => 'Power supply, electrical infrastructure, and rural electrification', 'icon' => 'zap', 'color' => '#FBBF24', 'display_order' => 8, 'status' => 'active', 'created_by' => 1],
         ];
 
         foreach ($sectors as &$sector) {
