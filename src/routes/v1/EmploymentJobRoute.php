@@ -34,7 +34,7 @@ return function (App $app) {
     $app->get('/v1/jobs/{id}', [$controller, 'show']);
 
     // Admin routes (require admin or web_admin role)
-    $app->group('/v1/jobs', function ($group) use ($controller) {
+    $adminRoutes = function ($group) use ($controller) {
         $group->get('', [$controller, 'index']);
         $group->post('', [$controller, 'store']);
         $group->put('/{id}', [$controller, 'update']);
@@ -44,5 +44,10 @@ return function (App $app) {
         // Applicants management
         $group->get('/{id}/applicants', [$controller, 'getApplicants']);
         $group->put('/{id}/applicants/{applicantId}', [$controller, 'updateApplicantStatus']);
-    })->add(new RoleMiddleware(['admin', 'web_admin']))->add($authMiddleware);
+    };
+
+    $allowedRoles = new RoleMiddleware(['admin', 'web_admin', 'mp', 'super_admin', 'officer']);
+
+    $app->group('/v1/jobs', $adminRoutes)->add($allowedRoles)->add($authMiddleware);
+    $app->group('/v1/admin/jobs', $adminRoutes)->add($allowedRoles)->add($authMiddleware);
 };

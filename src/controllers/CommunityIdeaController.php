@@ -276,23 +276,21 @@ class CommunityIdeaController
                 return ResponseHelper::error($response, 'Idea not found', 404);
             }
 
-            // Get web admin ID
+            // Get web admin ID if available, fallback to user ID
             $webAdmin = WebAdmin::findByUserId($user->id);
-            if (!$webAdmin) {
-                return ResponseHelper::error($response, 'Unauthorized', 403);
-            }
+            $reviewerId = $webAdmin ? $webAdmin->id : ($user->id ?? 1);
 
-            $notes = $data['notes'] ?? null;
+            $notes = $data['notes'] ?? $data['admin_notes'] ?? null;
 
             switch ($data['status']) {
                 case 'under_review':
-                    $idea->markAsUnderReview($webAdmin->id);
+                    $idea->markAsUnderReview($reviewerId);
                     break;
                 case 'approved':
-                    $idea->approve($webAdmin->id, $notes);
+                    $idea->approve($reviewerId, $notes);
                     break;
                 case 'rejected':
-                    $idea->reject($webAdmin->id, $notes);
+                    $idea->reject($reviewerId, $notes);
                     break;
                 case 'implemented':
                     $idea->markAsImplemented();

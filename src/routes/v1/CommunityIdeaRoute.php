@@ -45,10 +45,15 @@ return function (App $app) {
         ->add($authMiddleware);
 
     // Admin routes (require admin or web_admin role)
-    $app->group('/v1/ideas', function ($group) use ($controller) {
+    $adminIdeaRoutes = function ($group) use ($controller) {
         $group->get('', [$controller, 'index']);
         $group->put('/{id}', [$controller, 'update']);
         $group->delete('/{id}', [$controller, 'destroy']);
         $group->post('/{id}/status', [$controller, 'updateStatus']);
-    })->add(new RoleMiddleware(['admin', 'web_admin']))->add($authMiddleware);
+    };
+
+    $allowedIdeaRoles = new RoleMiddleware(['admin', 'web_admin', 'mp', 'super_admin', 'officer']);
+
+    $app->group('/v1/ideas', $adminIdeaRoutes)->add($allowedIdeaRoles)->add($authMiddleware);
+    $app->group('/v1/admin/ideas', $adminIdeaRoutes)->add($allowedIdeaRoles)->add($authMiddleware);
 };

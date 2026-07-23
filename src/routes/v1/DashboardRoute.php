@@ -19,13 +19,13 @@ return function (App $app) {
     $controller = $app->getContainer()->get(DashboardController::class);
     $authMiddleware = $app->getContainer()->get(AuthMiddleware::class);
 
-    // Admin dashboard routes (require admin or web_admin role)
+    // Admin dashboard routes (require admin, web_admin, mp, super_admin, officer role)
     $app->group('/v1/admin/dashboard', function ($group) use ($controller) {
         // GET /v1/admin/dashboard/stats - Get admin dashboard statistics
         $group->get('/stats', [$controller, 'adminStats']);
         // GET /v1/admin/dashboard/finance - Get finance overview data
         $group->get('/finance', [$controller, 'financeOverview']);
-    })->add(new RoleMiddleware(['admin', 'web_admin']))->add($authMiddleware);
+    })->add(new RoleMiddleware(['admin', 'web_admin', 'mp', 'super_admin', 'officer']))->add($authMiddleware);
 
     // Officer dashboard routes (require officer role)
     $app->group('/v1/officer/dashboard', function ($group) use ($controller) {

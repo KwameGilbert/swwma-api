@@ -72,7 +72,9 @@ return function ($app): void {
         '/v1/announcements' => ROUTE . 'v1/AnnouncementRoute.php',
         '/v1/admin/announcements' => ROUTE . 'v1/AnnouncementRoute.php',
         '/v1/jobs' => ROUTE . 'v1/EmploymentJobRoute.php',
+        '/v1/admin/jobs' => ROUTE . 'v1/EmploymentJobRoute.php',
         '/v1/ideas' => ROUTE . 'v1/CommunityIdeaRoute.php',
+        '/v1/admin/ideas' => ROUTE . 'v1/CommunityIdeaRoute.php',
         '/v1/youth-programs' => ROUTE . 'v1/YouthProgramRoute.php',
         '/v1/notifications' => ROUTE . 'v1/NotificationRoute.php',
     ];
