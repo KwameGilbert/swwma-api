@@ -12,7 +12,7 @@ class CreateTestAgentUser extends AbstractSeed
     public function run(): void
     {
         // Check if test agent already exists
-        $agentExists = $this->fetchRow("SELECT * FROM users WHERE email = 'testagent@comdevhub.com' LIMIT 1");
+        $agentExists = $this->fetchRow("SELECT * FROM users WHERE email = 'testagent@gmail.com' LIMIT 1");
 
         if ($agentExists) {
             echo "Test agent user already exists. Skipping...\n";
@@ -20,12 +20,12 @@ class CreateTestAgentUser extends AbstractSeed
         }
 
         // Hash password with Bcrypt (same as User model)
-        $passwordHash = password_hash('Agent@123', PASSWORD_DEFAULT);
+        $passwordHash = password_hash('Password@123', PASSWORD_DEFAULT);
 
         // Insert agent user
         $userData = [
             'name' => 'Test Agent',
-            'email' => 'testagent@comdevhub.com',
+            'email' => 'testagent@gmail.com',
             'phone' => '+233501234567',
             'password' => $passwordHash,
             'role' => 'agent',
@@ -71,8 +71,8 @@ class CreateTestAgentUser extends AbstractSeed
         }
 
         echo "✅ Test agent user created successfully!\n";
-        echo "   Email: testagent@comdevhub.com\n";
-        echo "   Password: Agent@123\n";
+        echo "   Email: testagent@gmail.com\n";
+        echo "   Password: Password@123\n";
         echo "   ⚠️  Use these credentials to test the agent dashboard.\n";
     }
 }

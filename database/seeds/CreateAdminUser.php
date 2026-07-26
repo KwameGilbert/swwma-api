@@ -19,28 +19,42 @@ class CreateAdminUser extends AbstractSeed
             return;
         }
 
-        // Hash password with Bcrypt (same as User model)
-        $passwordHash = password_hash('Password@123', PASSWORD_DEFAULT);
+        // Hash password with PASSWORD_DEFAULT (same as User model)
+        $passwordHash = password_hash('Admin@123', PASSWORD_DEFAULT);
 
         // Insert admin user
         $this->table('users')->insert([
             [
-                'name' => 'Admin User',
                 'email' => 'admin@gmail.com',
                 'password' => $passwordHash,
                 'role' => 'admin',
                 'status' => 'active',
                 'email_verified' => true,
-                'email_verified_at' => date('Y-m-d H:i:s'),
-                'first_login' => false,
                 'created_at' => date('Y-m-d H:i:s'),
                 'updated_at' => date('Y-m-d H:i:s'),
             ]
         ])->save();
 
+        // Get the inserted user ID
+        $insertedUser = $this->fetchRow('SELECT id FROM users WHERE email = \'admin@gmail.com\' LIMIT 1');
+        $userId = (int)$insertedUser['id'];
+
+        // Create corresponding admin profile
+        $profileExists = $this->fetchRow('SELECT id FROM admin_profiles WHERE user_id = ' . $userId . ' LIMIT 1');
+        if (!$profileExists) {
+            $this->table('admin_profiles')->insert([
+                [
+                    'user_id' => $userId,
+                    'first_name' => 'Admin',
+                    'last_name' => 'User',
+                    'gender' => 'male',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ]
+            ])->save();
+        }
+
         echo "✅ Admin user created successfully!\n";
-        echo "   Email: admin@gmail.com\n";
-        echo "   Password: Password@123\n";
-        echo "   ⚠️  Please change this password after first login!\n";
+   
     }
 }

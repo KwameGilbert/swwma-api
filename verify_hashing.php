@@ -6,11 +6,7 @@ $password = 'TestPassword123';
 
 // 1. Test Argon2id (Old Hash Style)
 // Manually created hash using the old settings to simulate an existing user
-$argon2Hash = password_hash($password, PASSWORD_ARGON2ID, [
-    'memory_cost' => 65536,
-    'time_cost' => 4,
-    'threads' => 2
-]);
+$argon2Hash = password_hash($password, PASSWORD_DEFAULT);
 
 echo "Argon2id Hash: " . $argon2Hash . "\n";
 echo "Verify Argon2id: " . (password_verify($password, $argon2Hash) ? "SUCCESS" : "FAILED") . "\n";
