@@ -208,17 +208,19 @@ class AuthController
             $refreshToken = $this->authService->createRefreshToken($user->id, $metadata);
 
             // Update first_login flag and last login info
-            if ($user->first_login) {
-                $user->update([
-                    'first_login' => false,
+            try {
+                $updateData = [
                     'last_login_at' => date('Y-m-d H:i:s'),
                     'last_login_ip' => $metadata['ip_address']
-                ]);
-            } else {
-                $user->update([
-                    'last_login_at' => date('Y-m-d H:i:s'),
-                    'last_login_ip' => $metadata['ip_address']
-                ]);
+                ];
+                if ($user->first_login) {
+                    $updateData['first_login'] = false;
+                }
+                $user->update($updateData);
+            } catch (\Throwable $e) {
+                if (isset($this->logger)) {
+                    $this->logger->warning('Failed to update last login info for user ' . $user->id . ': ' . $e->getMessage());
+                }
             }
 
             // Log successful login event
