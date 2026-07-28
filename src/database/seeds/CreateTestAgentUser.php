@@ -11,13 +11,13 @@ class CreateTestAgentUser extends AbstractSeed
      */
     public function run(): void
     {
-        // Check if test agent already exists
-        $agentExists = $this->fetchRow("SELECT * FROM users WHERE email = 'testagent@gmail.com' LIMIT 1");
-
-        if ($agentExists) {
-            echo "Test agent user already exists. Skipping...\n";
-            return;
+        // Truncate users and agents tables first
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
+        $this->execute('TRUNCATE TABLE users;');
+        if ($this->hasTable('agents')) {
+            $this->execute('TRUNCATE TABLE agents;');
         }
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
 
         // Hash password with Bcrypt (same as User model)
         $passwordHash = password_hash('Password@123', PASSWORD_DEFAULT);

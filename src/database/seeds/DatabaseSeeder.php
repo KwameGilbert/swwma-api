@@ -14,6 +14,29 @@ class DatabaseSeeder extends AbstractSeed
     {
         echo "🌱 Starting database seeding...\n\n";
 
+        // Truncate all tables first to start fresh and avoid duplicate key constraints
+        echo "🧹 Clearing existing data...\n";
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
+        $this->execute('TRUNCATE TABLE users;');
+        $this->execute('TRUNCATE TABLE web_admins;');
+        $this->execute('TRUNCATE TABLE officers;');
+        $this->execute('TRUNCATE TABLE agents;');
+        $this->execute('TRUNCATE TABLE task_force_members;');
+        $this->execute('TRUNCATE TABLE categories;');
+        $this->execute('TRUNCATE TABLE sectors;');
+        $this->execute('TRUNCATE TABLE sub_sectors;');
+        $this->execute('TRUNCATE TABLE projects;');
+        $this->execute('TRUNCATE TABLE blog_posts;');
+        $this->execute('TRUNCATE TABLE constituency_events;');
+        $this->execute('TRUNCATE TABLE faqs;');
+        $this->execute('TRUNCATE TABLE hero_slides;');
+        $this->execute('TRUNCATE TABLE community_stats;');
+        $this->execute('TRUNCATE TABLE contact_info;');
+        $this->execute('TRUNCATE TABLE issue_reports;');
+        $this->execute('TRUNCATE TABLE newsletter_subscribers;');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
+        echo "✓ Existing data cleared successfully\n\n";
+
         $this->seedUsers();
         $this->seedWebAdmins();
         $this->seedOfficers();
@@ -46,25 +69,25 @@ class DatabaseSeeder extends AbstractSeed
 
         $users = [
             // Web Admins
-            ['name' => 'Super Admin', 'email' => 'superadmin@gmail.com', 'phone' => '+233201234567', 'password' => $this->hashPassword('SuperAdmin@123'), 'role' => 'web_admin', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'John Mensah', 'email' => 'john.mensah@gmail.com', 'phone' => '+233202345678', 'password' => $this->hashPassword('Admin@123'), 'role' => 'web_admin', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Abena Osei', 'email' => 'abena.osei@gmail.com', 'phone' => '+233203456789', 'password' => $this->hashPassword('Admin@123'), 'role' => 'web_admin', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Super Admin', 'email' => 'superadmin@gmail.com', 'phone' => '+233201234567', 'password' => $this->hashPassword('Password@123'), 'role' => 'web_admin', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'John Mensah', 'email' => 'john.mensah@gmail.com', 'phone' => '+233202345678', 'password' => $this->hashPassword('Password@123'), 'role' => 'web_admin', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Abena Osei', 'email' => 'abena.osei@gmail.com', 'phone' => '+233203456789', 'password' => $this->hashPassword('Password@123'), 'role' => 'web_admin', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
             
             // Officers
-            ['name' => 'Kwame Asante', 'email' => 'kwame.asante@gmail.com', 'phone' => '+233204567890', 'password' => $this->hashPassword('Officer@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Efua Boateng', 'email' => 'efua.boateng@gmail.com', 'phone' => '+233205678901', 'password' => $this->hashPassword('Officer@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Kofi Adjei', 'email' => 'kofi.adjei@gmail.com', 'phone' => '+233206789012', 'password' => $this->hashPassword('Officer@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Akosua Darko', 'email' => 'akosua.darko@gmail.com', 'phone' => '+233207890123', 'password' => $this->hashPassword('Officer@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Kwame Asante', 'email' => 'kwame.asante@gmail.com', 'phone' => '+233204567890', 'password' => $this->hashPassword('Password@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Efua Boateng', 'email' => 'efua.boateng@gmail.com', 'phone' => '+233205678901', 'password' => $this->hashPassword('Password@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Kofi Adjei', 'email' => 'kofi.adjei@gmail.com', 'phone' => '+233206789012', 'password' => $this->hashPassword('Password@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Akosua Darko', 'email' => 'akosua.darko@gmail.com', 'phone' => '+233207890123', 'password' => $this->hashPassword('Password@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
             
             // Agents
-            ['name' => 'Yaw Frimpong', 'email' => 'yaw.frimpong@gmail.com', 'phone' => '+233208901234', 'password' => $this->hashPassword('Agent@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Ama Serwaa', 'email' => 'ama.serwaa@gmail.com', 'phone' => '+233209012345', 'password' => $this->hashPassword('Agent@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Kwabena Owusu', 'email' => 'kwabena.owusu@gmail.com', 'phone' => '+233200123456', 'password' => $this->hashPassword('Agent@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Adwoa Mensah', 'email' => 'adwoa.mensah@gmail.com', 'phone' => '+233201234599', 'password' => $this->hashPassword('Agent@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Yaw Frimpong', 'email' => 'yaw.frimpong@gmail.com', 'phone' => '+233208901234', 'password' => $this->hashPassword('Password@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Ama Serwaa', 'email' => 'ama.serwaa@gmail.com', 'phone' => '+233209012345', 'password' => $this->hashPassword('Password@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Kwabena Owusu', 'email' => 'kwabena.owusu@gmail.com', 'phone' => '+233200123456', 'password' => $this->hashPassword('Password@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Adwoa Mensah', 'email' => 'adwoa.mensah@gmail.com', 'phone' => '+233201234599', 'password' => $this->hashPassword('Password@123'), 'role' => 'agent', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
             
             // Task Force Members
-            ['name' => 'Emmanuel Tetteh', 'email' => 'emmanuel.tetteh@gmail.com', 'phone' => '+233202345699', 'password' => $this->hashPassword('TaskForce@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
-            ['name' => 'Grace Amoako', 'email' => 'grace.amoako@gmail.com', 'phone' => '+233203456799', 'password' => $this->hashPassword('TaskForce@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Emmanuel Tetteh', 'email' => 'emmanuel.tetteh@gmail.com', 'phone' => '+233202345699', 'password' => $this->hashPassword('Password@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
+            ['name' => 'Grace Amoako', 'email' => 'grace.amoako@gmail.com', 'phone' => '+233203456799', 'password' => $this->hashPassword('Password@123'), 'role' => 'officer', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
 
             // Requested accounts with Password@123
             ['name' => 'Admin User Extra', 'email' => 'admin@gmail.com', 'phone' => '+233201111111', 'password' => $this->hashPassword('Password@123'), 'role' => 'admin', 'email_verified' => true, 'email_verified_at' => date('Y-m-d H:i:s'), 'status' => 'active', 'first_login' => false],
@@ -79,89 +102,125 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('users')->insert($users)->saveData();
-        echo "   ✓ Created " . count($users) . " users\n";
+        echo "   ✓ Seeded " . count($users) . " users\n";
     }
 
     private function seedWebAdmins(): void
     {
         echo "🔐 Seeding web admins...\n";
 
-        $admins = [
-            ['user_id' => 1, 'employee_id' => 'ADM-001', 'admin_level' => 'super_admin', 'department' => 'Administration', 'permissions' => json_encode(['all']), 'notes' => 'Primary super administrator'],
-            ['user_id' => 2, 'employee_id' => 'ADM-002', 'admin_level' => 'admin', 'department' => 'Content Management', 'permissions' => json_encode(['content', 'events', 'blog']), 'notes' => 'Content administrator'],
-            ['user_id' => 3, 'employee_id' => 'ADM-003', 'admin_level' => 'moderator', 'department' => 'Communications', 'permissions' => json_encode(['blog', 'events']), 'notes' => 'Communications moderator'],
+        $adminsData = [
+            ['email' => 'superadmin@gmail.com', 'employee_id' => 'ADM-001', 'admin_level' => 'super_admin', 'department' => 'Administration', 'permissions' => json_encode(['all']), 'notes' => 'Primary super administrator'],
+            ['email' => 'john.mensah@gmail.com', 'employee_id' => 'ADM-002', 'admin_level' => 'admin', 'department' => 'Content Management', 'permissions' => json_encode(['content', 'events', 'blog']), 'notes' => 'Content administrator'],
+            ['email' => 'abena.osei@gmail.com', 'employee_id' => 'ADM-003', 'admin_level' => 'moderator', 'department' => 'Communications', 'permissions' => json_encode(['blog', 'events']), 'notes' => 'Communications moderator'],
         ];
 
-        foreach ($admins as &$admin) {
-            $admin['created_at'] = date('Y-m-d H:i:s');
-            $admin['updated_at'] = date('Y-m-d H:i:s');
+        $admins = [];
+        foreach ($adminsData as $adminItem) {
+            $user = $this->fetchRow("SELECT id FROM users WHERE email = '" . $adminItem['email'] . "' LIMIT 1");
+            if ($user) {
+                unset($adminItem['email']);
+                $adminItem['user_id'] = $user['id'];
+                $adminItem['created_at'] = date('Y-m-d H:i:s');
+                $adminItem['updated_at'] = date('Y-m-d H:i:s');
+                $admins[] = $adminItem;
+            }
         }
 
-        $this->table('web_admins')->insert($admins)->saveData();
-        echo "   ✓ Created " . count($admins) . " web admins\n";
+        if (!empty($admins)) {
+            $this->table('web_admins')->insert($admins)->saveData();
+        }
+        echo "   ✓ Seeded " . count($admins) . " web admins\n";
     }
 
     private function seedOfficers(): void
     {
         echo "👔 Seeding officers...\n";
 
-        $officers = [
-            ['user_id' => 4, 'employee_id' => 'OFF-001', 'title' => 'Senior Development Officer', 'department' => 'Infrastructure', 'assigned_sectors' => json_encode([1, 3]), 'assigned_locations' => json_encode(['Adum', 'Asafo']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => false, 'bio' => 'Experienced development officer with 10 years in infrastructure projects', 'office_location' => 'Block A, Office 12', 'office_phone' => '+233302123456'],
-            ['user_id' => 5, 'employee_id' => 'OFF-002', 'title' => 'Health Programs Officer', 'department' => 'Health', 'assigned_sectors' => json_encode([2]), 'assigned_locations' => json_encode(['Bantama', 'Subin']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => false, 'can_publish_content' => false, 'bio' => 'Public health specialist focused on community wellness', 'office_location' => 'Block B, Office 5', 'office_phone' => '+233302234567'],
-            ['user_id' => 6, 'employee_id' => 'OFF-003', 'title' => 'Education Officer', 'department' => 'Education', 'assigned_sectors' => json_encode([4]), 'assigned_locations' => json_encode(['Nhyiaeso', 'Oforikrom']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => true, 'bio' => 'Education policy expert and school development coordinator', 'office_location' => 'Block A, Office 8', 'office_phone' => '+233302345678'],
-            ['user_id' => 7, 'employee_id' => 'OFF-004', 'title' => 'Community Liaison Officer', 'department' => 'Community Relations', 'assigned_sectors' => json_encode([5, 6]), 'assigned_locations' => json_encode(['Tafo', 'Suame']), 'can_manage_projects' => false, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => false, 'bio' => 'Community engagement and social development specialist', 'office_location' => 'Block C, Office 3', 'office_phone' => '+233302456789'],
-            ['user_id' => 16, 'employee_id' => 'OFF-005', 'title' => 'Development Officer Extra', 'department' => 'Administration', 'assigned_sectors' => json_encode([1]), 'assigned_locations' => json_encode(['Adum']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => true, 'bio' => 'Development officer extra account', 'office_location' => 'Main Office', 'office_phone' => '+233200000000'],
+        $officersData = [
+            ['email' => 'kwame.asante@gmail.com', 'employee_id' => 'OFF-001', 'title' => 'Senior Development Officer', 'department' => 'Infrastructure', 'assigned_sectors' => json_encode([1, 3]), 'assigned_locations' => json_encode(['Adum', 'Asafo']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => false, 'bio' => 'Experienced development officer with 10 years in infrastructure projects', 'office_location' => 'Block A, Office 12', 'office_phone' => '+233302123456'],
+            ['email' => 'efua.boateng@gmail.com', 'employee_id' => 'OFF-002', 'title' => 'Health Programs Officer', 'department' => 'Health', 'assigned_sectors' => json_encode([2]), 'assigned_locations' => json_encode(['Bantama', 'Subin']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => false, 'can_publish_content' => false, 'bio' => 'Public health specialist focused on community wellness', 'office_location' => 'Block B, Office 5', 'office_phone' => '+233302234567'],
+            ['email' => 'kofi.adjei@gmail.com', 'employee_id' => 'OFF-003', 'title' => 'Education Officer', 'department' => 'Education', 'assigned_sectors' => json_encode([4]), 'assigned_locations' => json_encode(['Nhyiaeso', 'Oforikrom']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => true, 'bio' => 'Education policy expert and school development coordinator', 'office_location' => 'Block A, Office 8', 'office_phone' => '+233302345678'],
+            ['email' => 'akosua.darko@gmail.com', 'employee_id' => 'OFF-004', 'title' => 'Community Liaison Officer', 'department' => 'Community Relations', 'assigned_sectors' => json_encode([5, 6]), 'assigned_locations' => json_encode(['Tafo', 'Suame']), 'can_manage_projects' => false, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => false, 'bio' => 'Community engagement and social development specialist', 'office_location' => 'Block C, Office 3', 'office_phone' => '+233302456789'],
+            ['email' => 'officer@gmail.com', 'employee_id' => 'OFF-005', 'title' => 'Development Officer Extra', 'department' => 'Administration', 'assigned_sectors' => json_encode([1]), 'assigned_locations' => json_encode(['Adum']), 'can_manage_projects' => true, 'can_manage_reports' => true, 'can_manage_events' => true, 'can_publish_content' => true, 'bio' => 'Development officer extra account', 'office_location' => 'Main Office', 'office_phone' => '+233200000000'],
         ];
 
-        foreach ($officers as &$officer) {
-            $officer['created_at'] = date('Y-m-d H:i:s');
-            $officer['updated_at'] = date('Y-m-d H:i:s');
+        $officers = [];
+        foreach ($officersData as $officerItem) {
+            $user = $this->fetchRow("SELECT id FROM users WHERE email = '" . $officerItem['email'] . "' LIMIT 1");
+            if ($user) {
+                unset($officerItem['email']);
+                $officerItem['user_id'] = $user['id'];
+                $officerItem['created_at'] = date('Y-m-d H:i:s');
+                $officerItem['updated_at'] = date('Y-m-d H:i:s');
+                $officers[] = $officerItem;
+            }
         }
 
-        $this->table('officers')->insert($officers)->saveData();
-        echo "   ✓ Created " . count($officers) . " officers\n";
+        if (!empty($officers)) {
+            $this->table('officers')->insert($officers)->saveData();
+        }
+        echo "   ✓ Seeded " . count($officers) . " officers\n";
     }
 
     private function seedAgents(): void
     {
         echo "🚶 Seeding agents...\n";
 
-        $agents = [
-            ['user_id' => 8, 'agent_code' => 'AGT-001', 'supervisor_id' => 1, 'assigned_communities' => json_encode(['Adum Central', 'Adum North']), 'assigned_location' => 'Adum', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-123456789-0', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '123 Main St, Adum', 'emergency_contact_name' => 'Kofi Frimpong', 'emergency_contact_phone' => '+233201111111', 'reports_submitted' => 25],
-            ['user_id' => 9, 'agent_code' => 'AGT-002', 'supervisor_id' => 1, 'assigned_communities' => json_encode(['Bantama East', 'Bantama West']), 'assigned_location' => 'Bantama', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => false, 'id_type' => 'voter_id', 'id_number' => 'VID-987654321', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '45 Station Road, Bantama', 'emergency_contact_name' => 'Ama Kyere', 'emergency_contact_phone' => '+233202222222', 'reports_submitted' => 18],
-            ['user_id' => 10, 'agent_code' => 'AGT-003', 'supervisor_id' => 2, 'assigned_communities' => json_encode(['Asafo Market', 'Asafo Residential']), 'assigned_location' => 'Asafo', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-567890123-4', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '78 Commerce Street, Asafo', 'emergency_contact_name' => 'Yaw Mensah', 'emergency_contact_phone' => '+233203333333', 'reports_submitted' => 32],
-            ['user_id' => 11, 'agent_code' => 'AGT-004', 'supervisor_id' => 3, 'assigned_communities' => json_encode(['Subin Central']), 'assigned_location' => 'Subin', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => false, 'id_type' => 'ghana_card', 'id_number' => 'GHA-234567890-1', 'id_verified' => false, 'address' => '12 Unity Lane, Subin', 'emergency_contact_name' => 'Akua Boateng', 'emergency_contact_phone' => '+233204444444', 'reports_submitted' => 12],
-            ['user_id' => 15, 'agent_code' => 'AGT-005', 'supervisor_id' => 1, 'assigned_communities' => json_encode(['Central Area']), 'assigned_location' => 'Adum', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-999999999-9', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => 'Test Agent Address', 'emergency_contact_name' => 'Emergency Contact', 'emergency_contact_phone' => '+233200000000', 'reports_submitted' => 0],
+        $agentsData = [
+            ['email' => 'yaw.frimpong@gmail.com', 'agent_code' => 'AGT-001', 'supervisor_id' => 1, 'assigned_communities' => json_encode(['Adum Central', 'Adum North']), 'assigned_location' => 'Adum', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-123456789-0', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '123 Main St, Adum', 'emergency_contact_name' => 'Kofi Frimpong', 'emergency_contact_phone' => '+233201111111', 'reports_submitted' => 25],
+            ['email' => 'ama.serwaa@gmail.com', 'agent_code' => 'AGT-002', 'supervisor_id' => 1, 'assigned_communities' => json_encode(['Bantama East', 'Bantama West']), 'assigned_location' => 'Bantama', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => false, 'id_type' => 'voter_id', 'id_number' => 'VID-987654321', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '45 Station Road, Bantama', 'emergency_contact_name' => 'Ama Kyere', 'emergency_contact_phone' => '+233202222222', 'reports_submitted' => 18],
+            ['email' => 'kwabena.owusu@gmail.com', 'agent_code' => 'AGT-003', 'supervisor_id' => 2, 'assigned_communities' => json_encode(['Asafo Market', 'Asafo Residential']), 'assigned_location' => 'Asafo', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-567890123-4', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '78 Commerce Street, Asafo', 'emergency_contact_name' => 'Yaw Mensah', 'emergency_contact_phone' => '+233203333333', 'reports_submitted' => 32],
+            ['email' => 'adwoa.mensah@gmail.com', 'agent_code' => 'AGT-004', 'supervisor_id' => 3, 'assigned_communities' => json_encode(['Subin Central']), 'assigned_location' => 'Subin', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => false, 'id_type' => 'ghana_card', 'id_number' => 'GHA-234567890-1', 'id_verified' => false, 'address' => '12 Unity Lane, Subin', 'emergency_contact_name' => 'Akua Boateng', 'emergency_contact_phone' => '+233204444444', 'reports_submitted' => 12],
+            ['email' => 'agent@gmail.com', 'agent_code' => 'AGT-005', 'supervisor_id' => 1, 'assigned_communities' => json_encode(['Central Area']), 'assigned_location' => 'Adum', 'can_submit_reports' => true, 'can_collect_data' => true, 'can_register_residents' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-999999999-9', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => 'Test Agent Address', 'emergency_contact_name' => 'Emergency Contact', 'emergency_contact_phone' => '+233200000000', 'reports_submitted' => 0],
         ];
 
-        foreach ($agents as &$agent) {
-            $agent['created_at'] = date('Y-m-d H:i:s');
-            $agent['updated_at'] = date('Y-m-d H:i:s');
-            $agent['last_active_at'] = date('Y-m-d H:i:s', strtotime('-' . rand(1, 48) . ' hours'));
+        $agents = [];
+        foreach ($agentsData as $agentItem) {
+            $user = $this->fetchRow("SELECT id FROM users WHERE email = '" . $agentItem['email'] . "' LIMIT 1");
+            if ($user) {
+                unset($agentItem['email']);
+                $agentItem['user_id'] = $user['id'];
+                $agentItem['created_at'] = date('Y-m-d H:i:s');
+                $agentItem['updated_at'] = date('Y-m-d H:i:s');
+                $agentItem['last_active_at'] = date('Y-m-d H:i:s', strtotime('-' . rand(1, 48) . ' hours'));
+                $agents[] = $agentItem;
+            }
         }
 
-        $this->table('agents')->insert($agents)->saveData();
-        echo "   ✓ Created " . count($agents) . " agents\n";
+        if (!empty($agents)) {
+            $this->table('agents')->insert($agents)->saveData();
+        }
+        echo "   ✓ Seeded " . count($agents) . " agents\n";
     }
 
     private function seedTaskForceMembers(): void
     {
         echo "⚡ Seeding task force members...\n";
 
-        $members = [
-            ['user_id' => 12, 'employee_id' => 'TFM-001', 'title' => 'Infrastructure Specialist', 'specialization' => 'infrastructure', 'assigned_sectors' => json_encode([1, 3]), 'skills' => json_encode(['road construction', 'drainage systems', 'building inspection']), 'can_assess_issues' => true, 'can_resolve_issues' => true, 'can_request_resources' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-111222333-4', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '56 Engineers Ave, Kumasi', 'emergency_contact_name' => 'Mary Tetteh', 'emergency_contact_phone' => '+233205555555', 'assessments_completed' => 15, 'resolutions_completed' => 12],
-            ['user_id' => 13, 'employee_id' => 'TFM-002', 'title' => 'Water & Sanitation Expert', 'specialization' => 'water_sanitation', 'assigned_sectors' => json_encode([5]), 'skills' => json_encode(['water supply', 'sanitation systems', 'environmental health']), 'can_assess_issues' => true, 'can_resolve_issues' => true, 'can_request_resources' => false, 'id_type' => 'ghana_card', 'id_number' => 'GHA-444555666-7', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '89 Water Works Rd, Kumasi', 'emergency_contact_name' => 'Peter Amoako', 'emergency_contact_phone' => '+233206666666', 'assessments_completed' => 22, 'resolutions_completed' => 18],
-            ['user_id' => 17, 'employee_id' => 'TFM-003', 'title' => 'Taskforce Specialist Extra', 'specialization' => 'infrastructure', 'assigned_sectors' => json_encode([1]), 'skills' => json_encode(['general inspection']), 'can_assess_issues' => true, 'can_resolve_issues' => true, 'can_request_resources' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-888888888-8', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => 'Taskforce address', 'emergency_contact_name' => 'Emergency Contact', 'emergency_contact_phone' => '+233200000000', 'assessments_completed' => 0, 'resolutions_completed' => 0],
+        $membersData = [
+            ['email' => 'emmanuel.tetteh@gmail.com', 'employee_id' => 'TFM-001', 'title' => 'Infrastructure Specialist', 'specialization' => 'infrastructure', 'assigned_sectors' => json_encode([1, 3]), 'skills' => json_encode(['road construction', 'drainage systems', 'building inspection']), 'can_assess_issues' => true, 'can_resolve_issues' => true, 'can_request_resources' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-111222333-4', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '56 Engineers Ave, Kumasi', 'emergency_contact_name' => 'Mary Tetteh', 'emergency_contact_phone' => '+233205555555', 'assessments_completed' => 15, 'resolutions_completed' => 12],
+            ['email' => 'grace.amoako@gmail.com', 'employee_id' => 'TFM-002', 'title' => 'Water & Sanitation Expert', 'specialization' => 'water_sanitation', 'assigned_sectors' => json_encode([5]), 'skills' => json_encode(['water supply', 'sanitation systems', 'environmental health']), 'can_assess_issues' => true, 'can_resolve_issues' => true, 'can_request_resources' => false, 'id_type' => 'ghana_card', 'id_number' => 'GHA-444555666-7', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => '89 Water Works Rd, Kumasi', 'emergency_contact_name' => 'Peter Amoako', 'emergency_contact_phone' => '+233206666666', 'assessments_completed' => 22, 'resolutions_completed' => 18],
+            ['email' => 'taskforce@gmail.com', 'employee_id' => 'TFM-003', 'title' => 'Taskforce Specialist Extra', 'specialization' => 'infrastructure', 'assigned_sectors' => json_encode([1]), 'skills' => json_encode(['general inspection']), 'can_assess_issues' => true, 'can_resolve_issues' => true, 'can_request_resources' => true, 'id_type' => 'ghana_card', 'id_number' => 'GHA-888888888-8', 'id_verified' => true, 'id_verified_at' => date('Y-m-d H:i:s'), 'address' => 'Taskforce address', 'emergency_contact_name' => 'Emergency Contact', 'emergency_contact_phone' => '+233200000000', 'assessments_completed' => 0, 'resolutions_completed' => 0],
         ];
 
-        foreach ($members as &$member) {
-            $member['created_at'] = date('Y-m-d H:i:s');
-            $member['updated_at'] = date('Y-m-d H:i:s');
-            $member['last_active_at'] = date('Y-m-d H:i:s', strtotime('-' . rand(1, 24) . ' hours'));
+        $members = [];
+        foreach ($membersData as $memberItem) {
+            $user = $this->fetchRow("SELECT id FROM users WHERE email = '" . $memberItem['email'] . "' LIMIT 1");
+            if ($user) {
+                unset($memberItem['email']);
+                $memberItem['user_id'] = $user['id'];
+                $memberItem['created_at'] = date('Y-m-d H:i:s');
+                $memberItem['updated_at'] = date('Y-m-d H:i:s');
+                $memberItem['last_active_at'] = date('Y-m-d H:i:s', strtotime('-' . rand(1, 24) . ' hours'));
+                $members[] = $memberItem;
+            }
         }
 
-        $this->table('task_force_members')->insert($members)->saveData();
-        echo "   ✓ Created " . count($members) . " task force members\n";
+        if (!empty($members)) {
+            $this->table('task_force_members')->insert($members)->saveData();
+        }
+        echo "   ✓ Seeded " . count($members) . " task force members\n";
     }
 
     private function seedCategories(): void
@@ -187,7 +246,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('categories')->insert($categories)->saveData();
-        echo "   ✓ Created " . count($categories) . " categories\n";
+        echo "   ✓ Seeded " . count($categories) . " categories\n";
     }
 
     private function seedSectors(): void
@@ -211,7 +270,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('sectors')->insert($sectors)->saveData();
-        echo "   ✓ Created " . count($sectors) . " sectors\n";
+        echo "   ✓ Seeded " . count($sectors) . " sectors\n";
     }
 
     private function seedSubSectors(): void
@@ -258,7 +317,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('sub_sectors')->insert($subSectors)->saveData();
-        echo "   ✓ Created " . count($subSectors) . " sub-sectors\n";
+        echo "   ✓ Seeded " . count($subSectors) . " sub-sectors\n";
     }
 
     private function seedProjects(): void
@@ -282,7 +341,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('projects')->insert($projects)->saveData();
-        echo "   ✓ Created " . count($projects) . " projects\n";
+        echo "   ✓ Seeded " . count($projects) . " projects\n";
     }
 
     private function seedBlogPosts(): void
@@ -303,7 +362,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('blog_posts')->insert($posts)->saveData();
-        echo "   ✓ Created " . count($posts) . " blog posts\n";
+        echo "   ✓ Seeded " . count($posts) . " blog posts\n";
     }
 
     private function seedEvents(): void
@@ -324,7 +383,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('constituency_events')->insert($events)->saveData();
-        echo "   ✓ Created " . count($events) . " events\n";
+        echo "   ✓ Seeded " . count($events) . " events\n";
     }
 
     private function seedFaqs(): void
@@ -348,7 +407,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('faqs')->insert($faqs)->saveData();
-        echo "   ✓ Created " . count($faqs) . " FAQs\n";
+        echo "   ✓ Seeded " . count($faqs) . " FAQs\n";
     }
 
     private function seedHeroSlides(): void
@@ -368,7 +427,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('hero_slides')->insert($slides)->saveData();
-        echo "   ✓ Created " . count($slides) . " hero slides\n";
+        echo "   ✓ Seeded " . count($slides) . " hero slides\n";
     }
 
     private function seedCommunityStats(): void
@@ -390,7 +449,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('community_stats')->insert($stats)->saveData();
-        echo "   ✓ Created " . count($stats) . " community stats\n";
+        echo "   ✓ Seeded " . count($stats) . " community stats\n";
     }
 
     private function seedContactInfo(): void
@@ -414,7 +473,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('contact_info')->insert($contacts)->saveData();
-        echo "   ✓ Created " . count($contacts) . " contact entries\n";
+        echo "   ✓ Seeded " . count($contacts) . " contact entries\n";
     }
 
     private function seedIssueReports(): void
@@ -436,7 +495,7 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('issue_reports')->insert($issues)->saveData();
-        echo "   ✓ Created " . count($issues) . " issue reports\n";
+        echo "   ✓ Seeded " . count($issues) . " issue reports\n";
     }
 
     private function seedNewsletterSubscribers(): void
@@ -459,6 +518,6 @@ class DatabaseSeeder extends AbstractSeed
         }
 
         $this->table('newsletter_subscribers')->insert($subscribers)->saveData();
-        echo "   ✓ Created " . count($subscribers) . " newsletter subscribers\n";
+        echo "   ✓ Seeded " . count($subscribers) . " newsletter subscribers\n";
     }
 }

@@ -11,13 +11,10 @@ class CreateAdminUser extends AbstractSeed
      */
     public function run(): void
     {
-        // Check if admin already exists
-        $adminExists = $this->fetchRow('SELECT * FROM users WHERE role = \'admin\' LIMIT 1');
-
-        if ($adminExists) {
-            echo "Admin user already exists. Skipping...\n";
-            return;
-        }
+        // Truncate users table first
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
+        $this->execute('TRUNCATE TABLE users;');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
 
         // Hash password with Bcrypt (same as User model)
         $passwordHash = password_hash('Password@123', PASSWORD_DEFAULT);

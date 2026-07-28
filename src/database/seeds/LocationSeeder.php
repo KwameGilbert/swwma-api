@@ -234,12 +234,11 @@ class LocationSeeder extends AbstractSeed
             ['id' => 215, 'name' => 'AKWASI ADDAEKROM', 'type' => 'community', 'parent_id' => 49, 'status' => 'active'],
         ];
 
-        $table = $this->table('locations');
-        
-        // Use truncate if you want to start fresh, but be careful with foreign keys
-        // $table->truncate();
-        
-        $table->insert($data)
-              ->saveData();
+        // Safe truncate locations table
+        $this->execute('SET FOREIGN_KEY_CHECKS = 0;');
+        $this->execute('TRUNCATE TABLE locations;');
+        $this->execute('SET FOREIGN_KEY_CHECKS = 1;');
+
+        $this->table('locations')->insert($data)->saveData();
     }
 }
