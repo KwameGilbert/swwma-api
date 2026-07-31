@@ -55,6 +55,6 @@ class CreateAdminUser extends AbstractSeed
         }
 
         echo "✅ Admin user created successfully!\n";
-   
+
     }
 }
