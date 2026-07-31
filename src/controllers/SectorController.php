@@ -26,7 +26,14 @@ class SectorController
     public function index(Request $request, Response $response): Response
     {
         try {
-            $sectors = Sector::active()->withCount('projects')->get();
+            $queryParams = $request->getQueryParams();
+            $query = Sector::active()->withCount('projects');
+
+            if (!empty($queryParams['category_id'])) {
+                $query->where('category_id', $queryParams['category_id']);
+            }
+
+            $sectors = $query->get();
 
             return ResponseHelper::success($response, 'Sectors fetched successfully', [
                 'sectors' => $sectors->map(fn($s) => $s->toPublicArray())->toArray()
