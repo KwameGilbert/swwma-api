@@ -38,8 +38,6 @@ final class ConsolidatedSchema extends AbstractMigration
         
         if (!$this->hasTable('users')) {
             $users->create();
-        } else {
-            $users->save();
         }
 
         // 2. WEB ADMINS
@@ -61,8 +59,6 @@ final class ConsolidatedSchema extends AbstractMigration
         
         if (!$this->hasTable('web_admins')) {
             $webAdmins->create();
-        } else {
-            $webAdmins->save();
         }
 
         // 3. OFFICERS
@@ -91,8 +87,6 @@ final class ConsolidatedSchema extends AbstractMigration
         
         if (!$this->hasTable('officers')) {
             $officers->create();
-        } else {
-            $officers->save();
         }
 
         // 4. AGENTS
@@ -127,8 +121,6 @@ final class ConsolidatedSchema extends AbstractMigration
         
         if (!$this->hasTable('agents')) {
             $agents->create();
-        } else {
-            $agents->save();
         }
 
         // 5. TASK FORCE MEMBERS
@@ -164,8 +156,6 @@ final class ConsolidatedSchema extends AbstractMigration
         
         if (!$this->hasTable('task_force_members')) {
             $taskForce->create();
-        } else {
-            $taskForce->save();
         }
 
         // 6. PASSWORD RESETS
@@ -182,8 +172,6 @@ final class ConsolidatedSchema extends AbstractMigration
         
         if (!$this->hasTable('password_resets')) {
             $passwordResets->create();
-        } else {
-            $passwordResets->save();
         }
 
         // 7. REFRESH TOKENS
@@ -207,8 +195,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('refresh_tokens')) {
             $refreshTokens->create();
-        } else {
-            $refreshTokens->save();
         }
 
         // 8. EMAIL VERIFICATION TOKENS
@@ -227,8 +213,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('email_verification_tokens')) {
             $emailTokens->create();
-        } else {
-            $emailTokens->save();
         }
 
         // 9. AUDIT LOGS
@@ -252,8 +236,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('audit_logs')) {
             $auditLogs->create();
-        } else {
-            $auditLogs->save();
         }
 
         // 10. LOCATIONS
@@ -278,8 +260,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('locations')) {
             $locations->create();
-        } else {
-            $locations->save();
         }
 
         // 11. CATEGORIES
@@ -302,8 +282,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('categories')) {
             $categories->create();
-        } else {
-            $categories->save();
         }
 
         // 12. SECTORS
@@ -328,8 +306,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('sectors')) {
             $sectors->create();
-        } else {
-            $sectors->save();
         }
 
         // 13. SUB SECTORS
@@ -350,8 +326,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('sub_sectors')) {
             $subSectors->create();
-        } else {
-            $subSectors->save();
         }
 
         // 14. NOTIFICATIONS
@@ -377,8 +351,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('notifications')) {
             $notifications->create();
-        } else {
-            $notifications->save();
         }
 
         // 15. ANNOUNCEMENTS
@@ -407,8 +379,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('announcements')) {
             $announcements->create();
-        } else {
-            $announcements->save();
         }
 
         // 16. BLOG POSTS
@@ -436,8 +406,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('blog_posts')) {
             $blogPosts->create();
-        } else {
-            $blogPosts->save();
         }
 
         // 17. HERO SLIDES
@@ -461,8 +429,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('hero_slides')) {
             $heroSlides->create();
-        } else {
-            $heroSlides->save();
         }
 
         // 18. FAQS
@@ -481,8 +447,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('faqs')) {
             $faqs->create();
-        } else {
-            $faqs->save();
         }
 
         // 19. CONSTITUENCY EVENTS
@@ -514,8 +478,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('constituency_events')) {
             $events->create();
-        } else {
-            $events->save();
         }
 
         // 20. CONTACT INFO
@@ -535,8 +497,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('contact_info')) {
             $contactInfo->create();
-        } else {
-            $contactInfo->save();
         }
 
         // 21. COMMUNITY STATS
@@ -554,8 +514,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('community_stats')) {
             $communityStats->create();
-        } else {
-            $communityStats->save();
         }
 
         // 22. NEWSLETTER SUBSCRIBERS
@@ -573,8 +531,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('newsletter_subscribers')) {
             $subscribers->create();
-        } else {
-            $subscribers->save();
         }
 
         // 23. GALLERIES
@@ -597,8 +553,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('galleries')) {
             $galleries->create();
-        } else {
-            $galleries->save();
         }
 
         // 24. COMMUNITY IDEAS
@@ -636,8 +590,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('community_ideas')) {
             $ideas->create();
-        } else {
-            $ideas->save();
         }
 
         // 25. COMMUNITY IDEA VOTES
@@ -654,8 +606,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('community_idea_votes')) {
             $ideaVotes->create();
-        } else {
-            $ideaVotes->save();
         }
 
         // 26. PROJECTS
@@ -691,8 +641,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('projects')) {
             $projects->create();
-        } else {
-            $projects->save();
         }
 
         // 27. EMPLOYMENT JOBS
@@ -730,8 +678,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('employment_jobs')) {
             $jobs->create();
-        } else {
-            $jobs->save();
         }
 
         // 28. JOB APPLICANTS
@@ -752,8 +698,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('job_applicants')) {
             $applicants->create();
-        } else {
-            $applicants->save();
         }
 
         // 29. ISSUE REPORTS
@@ -811,8 +755,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('issue_reports')) {
             $reports->create();
-        } else {
-            $reports->save();
         }
 
         // 30. ISSUE REPORT COMMENTS
@@ -830,8 +772,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('issue_report_comments')) {
             $comments->create();
-        } else {
-            $comments->save();
         }
 
         // 31. ISSUE REPORT STATUS HISTORY
@@ -848,8 +788,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('issue_report_status_history')) {
             $history->create();
-        } else {
-            $history->save();
         }
 
         // 32. ISSUE ASSESSMENT REPORTS
@@ -872,8 +810,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('issue_assessment_reports')) {
             $assessments->create();
-        } else {
-            $assessments->save();
         }
 
         // 33. ISSUE RESOLUTION REPORTS
@@ -894,8 +830,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('issue_resolution_reports')) {
             $resolutions->create();
-        } else {
-            $resolutions->save();
         }
 
         // 34. YOUTH PROGRAMS
@@ -926,8 +860,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('youth_programs')) {
             $youthPrograms->create();
-        } else {
-            $youthPrograms->save();
         }
 
         // 35. YOUTH PROGRAM PARTICIPANTS
@@ -945,8 +877,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('youth_program_participants')) {
             $participants->create();
-        } else {
-            $participants->save();
         }
 
         // 36. YOUTH RECORDS
@@ -994,8 +924,6 @@ final class ConsolidatedSchema extends AbstractMigration
 
         if (!$this->hasTable('youth_records')) {
             $youthRecords->create();
-        } else {
-            $youthRecords->save();
         }
     }
 
