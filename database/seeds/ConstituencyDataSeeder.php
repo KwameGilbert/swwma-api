@@ -10,18 +10,19 @@ class ConstituencyDataSeeder extends AbstractSeed
         // Disable foreign key checks to allow insertion of hierarchical data without ordering issues
         $this->execute("SET FOREIGN_KEY_CHECKS = 0");
 
-        // 1. Ensure Categories 1-10 exist
+        // 1. Ensure Categories 1-11 exist
         $categories = [
-            ['id' => 1, 'name' => 'Water', 'slug' => 'water'],
-            ['id' => 2, 'name' => 'Power', 'slug' => 'power'],
-            ['id' => 3, 'name' => 'Roads', 'slug' => 'roads'],
-            ['id' => 4, 'name' => 'Sanitation', 'slug' => 'sanitation'],
-            ['id' => 5, 'name' => 'Health', 'slug' => 'health'],
-            ['id' => 6, 'name' => 'Education', 'slug' => 'education'],
-            ['id' => 7, 'name' => 'Agriculture', 'slug' => 'agriculture'],
-            ['id' => 8, 'name' => 'Employment', 'slug' => 'employment'],
-            ['id' => 9, 'name' => 'Social Protection', 'slug' => 'social-protection'],
-            ['id' => 10, 'name' => 'Security & Governance', 'slug' => 'security-governance'],
+            ['id' => 1, 'name' => 'Infrastructure', 'slug' => 'infrastructure'],
+            ['id' => 2, 'name' => 'Health', 'slug' => 'health'],
+            ['id' => 3, 'name' => 'Road and Transport', 'slug' => 'road-and-transport'],
+            ['id' => 4, 'name' => 'Education', 'slug' => 'education'],
+            ['id' => 5, 'name' => 'Sanitation', 'slug' => 'sanitation'],
+            ['id' => 6, 'name' => 'Agriculture', 'slug' => 'agriculture'],
+            ['id' => 7, 'name' => 'Electricity', 'slug' => 'electricity'],
+            ['id' => 8, 'name' => 'Youth and Sports', 'slug' => 'youth-and-sports'],
+            ['id' => 9, 'name' => 'Security', 'slug' => 'security'],
+            ['id' => 10, 'name' => 'Governance', 'slug' => 'governance'],
+            ['id' => 11, 'name' => 'Water', 'slug' => 'water'],
         ];
 
         foreach ($categories as $cat) {

@@ -228,16 +228,17 @@ class DatabaseSeeder extends AbstractSeed
         echo "📁 Seeding categories...\n";
 
         $categories = [
-            ['id' => 1, 'name' => 'WATER', 'slug' => 'water', 'description' => 'Water supply, infrastructure and flood control', 'icon' => 'droplet', 'color' => '#3B82F6', 'display_order' => 1, 'status' => 'active'],
-            ['id' => 2, 'name' => 'ELECTRICITY', 'slug' => 'electricity', 'description' => 'Power supply, electrical infrastructure and street lighting', 'icon' => 'zap', 'color' => '#F59E0B', 'display_order' => 2, 'status' => 'active'],
-            ['id' => 3, 'name' => 'ROADS', 'slug' => 'roads', 'description' => 'Feeder roads, urban roads and transport structures', 'icon' => 'road', 'color' => '#6B7280', 'display_order' => 3, 'status' => 'active'],
-            ['id' => 4, 'name' => 'SANITATION', 'slug' => 'sanitation', 'description' => 'Waste management, drainage, sewage and public hygiene', 'icon' => 'trash-2', 'color' => '#10B981', 'display_order' => 4, 'status' => 'active'],
-            ['id' => 5, 'name' => 'HEALTH', 'slug' => 'health', 'description' => 'Health facilities, personnel, services and medical supplies', 'icon' => 'heart-pulse', 'color' => '#EF4444', 'display_order' => 5, 'status' => 'active'],
-            ['id' => 6, 'name' => 'EDUCATION', 'slug' => 'education', 'description' => 'School infrastructure, teaching, learning and welfare', 'icon' => 'graduation-cap', 'color' => '#8B5CF6', 'display_order' => 6, 'status' => 'active'],
-            ['id' => 7, 'name' => 'AGRICULTURE', 'slug' => 'agriculture', 'description' => 'Crop farming, livestock, fisheries and agricultural infrastructure', 'icon' => 'wheat', 'color' => '#22C55E', 'display_order' => 7, 'status' => 'active'],
-            ['id' => 8, 'name' => 'EMPLOYMENT', 'slug' => 'employment', 'description' => 'Unemployment, skills training and labour issues', 'icon' => 'briefcase', 'color' => '#0EA5E9', 'display_order' => 8, 'status' => 'active'],
-            ['id' => 9, 'name' => 'SOCIAL WELFARE ASSISTANCE', 'slug' => 'social-welfare-assistance', 'description' => 'Financial support, vulnerable groups and social protection', 'icon' => 'hand-helping', 'color' => '#EC4899', 'display_order' => 9, 'status' => 'active'],
-            ['id' => 10, 'name' => 'OTHER', 'slug' => 'other', 'description' => 'Security, land, housing, governance and civic issues', 'icon' => 'more-horizontal', 'color' => '#64748B', 'display_order' => 10, 'status' => 'active'],
+            ['id' => 1, 'name' => 'Infrastructure', 'slug' => 'infrastructure', 'description' => 'Housing, ICT, public buildings, market infrastructure, street lighting, drainage, and waste management.', 'icon' => 'building', 'color' => '#3B82F6', 'display_order' => 1, 'status' => 'active'],
+            ['id' => 2, 'name' => 'Health', 'slug' => 'health', 'description' => 'Health infrastructure, maternal & child health, community outreach, disease control, and ambulances.', 'icon' => 'heart-pulse', 'color' => '#EF4444', 'display_order' => 2, 'status' => 'active'],
+            ['id' => 3, 'name' => 'Road and Transport', 'slug' => 'road-and-transport', 'description' => 'Roads, bridges, feeder roads, footbridges, safety programs, and transport terminals.', 'icon' => 'road', 'color' => '#F59E0B', 'display_order' => 3, 'status' => 'active'],
+            ['id' => 4, 'name' => 'Education', 'slug' => 'education', 'description' => 'School blocks, teacher training, school feeding, scholarships, libraries, and vocational training.', 'icon' => 'graduation-cap', 'color' => '#10B981', 'display_order' => 4, 'status' => 'active'],
+            ['id' => 5, 'name' => 'Sanitation', 'slug' => 'sanitation', 'description' => 'Water supply, public toilets, waste collection, boreholes, hygiene education, and flood control.', 'icon' => 'droplet', 'color' => '#06B6D4', 'display_order' => 5, 'status' => 'active'],
+            ['id' => 6, 'name' => 'Agriculture', 'slug' => 'agriculture', 'description' => 'Agriculture development, markets, local economy, tourism, forestry, and agro-processing.', 'icon' => 'wheat', 'color' => '#84CC16', 'display_order' => 6, 'status' => 'active'],
+            ['id' => 7, 'name' => 'Electricity', 'slug' => 'electricity', 'description' => 'Rural electrification, solar power, street lights, transformers, and renewable energy.', 'icon' => 'zap', 'color' => '#FBBF24', 'display_order' => 7, 'status' => 'active'],
+            ['id' => 8, 'name' => 'Youth and Sports', 'slug' => 'youth-and-sports', 'description' => 'Youth empowerment, sports infrastructure, talent development, and skills training.', 'icon' => 'users', 'color' => '#8B5CF6', 'display_order' => 8, 'status' => 'active'],
+            ['id' => 9, 'name' => 'Security', 'slug' => 'security', 'description' => 'Police, fire service, disaster management, emergency response and surveillance.', 'icon' => 'shield', 'color' => '#EC4899', 'display_order' => 9, 'status' => 'active'],
+            ['id' => 10, 'name' => 'Governance', 'slug' => 'governance', 'description' => 'Public administration, social interventions, community development, women empowerment, and civic education.', 'icon' => 'landmark', 'color' => '#64748B', 'display_order' => 10, 'status' => 'active'],
+            ['id' => 11, 'name' => 'Water', 'slug' => 'water', 'description' => 'Water supply infrastructure, rural & urban water supply, boreholes, purification, storage, distribution, rainwater harvesting, protection and emergency water services.', 'icon' => 'droplet', 'color' => '#0EA5E9', 'display_order' => 11, 'status' => 'active'],
         ];
 
         foreach ($categories as &$category) {
@@ -253,71 +254,263 @@ class DatabaseSeeder extends AbstractSeed
     {
         echo "📊 Seeding sectors...\n";
 
-        $sectors = [
-            ['id' => 1, 'category_id' => 10, 'name' => 'Infrastructure', 'slug' => 'infrastructure', 'description' => 'Roads, bridges, drainage systems, and public buildings development', 'icon' => 'building', 'color' => '#3B82F6', 'display_order' => 1, 'status' => 'active', 'created_by' => 1],
-            ['id' => 2, 'category_id' => 5, 'name' => 'Healthcare', 'slug' => 'healthcare', 'description' => 'Hospitals, clinics, medical equipment, and health programs', 'icon' => 'heart-pulse', 'color' => '#EF4444', 'display_order' => 2, 'status' => 'active', 'created_by' => 1],
-            ['id' => 3, 'category_id' => 3, 'name' => 'Roads & Transport', 'slug' => 'roads-transport', 'description' => 'Road construction, rehabilitation, and transport infrastructure', 'icon' => 'road', 'color' => '#F59E0B', 'display_order' => 3, 'status' => 'active', 'created_by' => 1],
-            ['id' => 4, 'category_id' => 6, 'name' => 'Education', 'slug' => 'education', 'description' => 'Schools, educational facilities, and learning programs', 'icon' => 'graduation-cap', 'color' => '#10B981', 'display_order' => 4, 'status' => 'active', 'created_by' => 1],
-            ['id' => 5, 'category_id' => 1, 'name' => 'Water & Sanitation', 'slug' => 'water-sanitation', 'description' => 'Clean water supply, sanitation facilities, and waste management', 'icon' => 'droplet', 'color' => '#06B6D4', 'display_order' => 5, 'status' => 'active', 'created_by' => 1],
-            ['id' => 6, 'category_id' => 7, 'name' => 'Agriculture', 'slug' => 'agriculture', 'description' => 'Farming support, irrigation systems, and agricultural development', 'icon' => 'wheat', 'color' => '#84CC16', 'display_order' => 6, 'status' => 'active', 'created_by' => 1],
-            ['id' => 7, 'category_id' => 10, 'name' => 'Youth & Sports', 'slug' => 'youth-sports', 'description' => 'Youth development programs, sports facilities, and recreational activities', 'icon' => 'users', 'color' => '#8B5CF6', 'display_order' => 7, 'status' => 'active', 'created_by' => 1],
-            ['id' => 8, 'category_id' => 2, 'name' => 'Electricity', 'slug' => 'electricity', 'description' => 'Power supply, electrical infrastructure, and rural electrification', 'icon' => 'zap', 'color' => '#FBBF24', 'display_order' => 8, 'status' => 'active', 'created_by' => 1],
+        $sectorDefinitions = [
+            // Category 1: Infrastructure
+            1 => [
+                'Housing & Human Settlement',
+                'ICT & Digital Transformation',
+                'Public Buildings Infrastructure',
+                'Market Infrastructure',
+                'Street Lighting',
+                'Drainage Systems',
+                'Public Toilets Infrastructure',
+                'Waste Management Infrastructure',
+                'Telecommunications Infrastructure',
+                'Urban Planning & Zoning'
+            ],
+            // Category 2: Health
+            2 => [
+                'Health Infrastructure',
+                'Maternal & Child Health Services',
+                'Community Health Outreach',
+                'Health Equipment & Supplies',
+                'Disease Prevention & Control',
+                'Ambulance Services',
+                'Pharmaceutical Supply',
+                'Health Insurance Support',
+                'Nutrition Programs',
+                'Mental Health Services'
+            ],
+            // Category 3: Road and Transport
+            3 => [
+                'Roads & Transport',
+                'Transport Services',
+                'Bridge Construction',
+                'Culverts & Drainage',
+                'Street Signage & Traffic Management',
+                'Footbridges & Walkways',
+                'Feeder Roads',
+                'Vehicle & Fleet Management',
+                'Road Safety Programs',
+                'Public Transport Terminals'
+            ],
+            // Category 4: Education
+            4 => [
+                'Education Infrastructure',
+                'Teacher Training & Development',
+                'School Feeding Programs',
+                'Scholarship & Bursary Support',
+                'Library & Learning Resources',
+                'Early Childhood Education',
+                'Vocational & Technical Education',
+                'School Furniture Supply',
+                'ICT in Education',
+                'Adult Literacy Programs'
+            ],
+            // Category 5: Sanitation
+            5 => [
+                'Water & Sanitation',
+                'Water Resources',
+                'Public Toilet Facilities',
+                'Waste Collection & Disposal',
+                'Sewerage Systems',
+                'Borehole Drilling',
+                'Hand Pump Installation',
+                'Hygiene Education Programs',
+                'Solid Waste Management',
+                'Drainage & Flood Control'
+            ],
+            // Category 6: Agriculture
+            6 => [
+                'Agriculture Development',
+                'Markets & Local Economic Development',
+                'Economic Development',
+                'Tourism & Culture',
+                'Forestry & Natural Resources',
+                'Irrigation Schemes',
+                'Farmer Cooperatives Support',
+                'Livestock Development',
+                'Agro-processing Facilities',
+                'Post-Harvest Storage'
+            ],
+            // Category 7: Electricity
+            7 => [
+                'Electricity & Energy',
+                'Rural Electrification',
+                'Solar Power Installation',
+                'Street Lighting Solar Systems',
+                'Power Distribution Networks',
+                'Transformer Installation',
+                'Renewable Energy Projects',
+                'Energy Efficiency Programs',
+                'Grid Extension',
+                'Backup Power Systems'
+            ],
+            // Category 8: Youth and Sports
+            8 => [
+                'Youth & Sports Development',
+                'Sports Infrastructure',
+                'Youth Employment Programs',
+                'Sports Talent Development',
+                'Recreational Facilities',
+                'Youth Skills Training',
+                'Community Sports Clubs Support',
+                'Sports Equipment Provision',
+                'Youth Leadership Programs',
+                'National Youth Games Support'
+            ],
+            // Category 9: Security
+            9 => [
+                'Security & Emergency Services',
+                'Disaster Management',
+                'Police Infrastructure Support',
+                'Fire Service Support',
+                'Community Policing Programs',
+                'Border & Border Post Security',
+                'Emergency Response Equipment',
+                'Flood & Disaster Relief',
+                'Crime Prevention Programs',
+                'Security Surveillance Systems'
+            ],
+            // Category 10: Governance
+            10 => [
+                'Governance & Public Administration',
+                'Social Intervention',
+                'Community Development',
+                'Women Empowerment',
+                'Persons with Disabilities',
+                'Environment & Climate',
+                'Public Services',
+                'Local Government Capacity Building',
+                'Civic Education Programs',
+                'Records & Documentation Management'
+            ],
+            // Category 11: Water
+            11 => [
+                'Water Supply Infrastructure',
+                'Rural Water Supply',
+                'Urban Water Supply',
+                'Boreholes & Groundwater Development',
+                'Water Treatment & Purification',
+                'Water Storage Systems',
+                'Water Distribution Networks',
+                'Rainwater Harvesting',
+                'Water Resources Protection',
+                'Emergency Water Services'
+            ],
         ];
 
-        foreach ($sectors as &$sector) {
-            $sector['created_at'] = date('Y-m-d H:i:s');
-            $sector['updated_at'] = date('Y-m-d H:i:s');
+        $sectors = [];
+        $sectorId = 1;
+        foreach ($sectorDefinitions as $catId => $sectorNames) {
+            foreach ($sectorNames as $name) {
+                $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9]+/', '-', $name), '-'));
+                $sectors[] = [
+                    'id' => $sectorId,
+                    'category_id' => $catId,
+                    'name' => $name,
+                    'slug' => $slug,
+                    'description' => $name . ' initiatives and management',
+                    'icon' => 'folder',
+                    'color' => '#3B82F6',
+                    'display_order' => $sectorId,
+                    'status' => 'active',
+                    'created_by' => 1,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ];
+                $sectorId++;
+            }
         }
 
         $this->table('sectors')->insert($sectors)->saveData();
-        echo "   ✓ Seeded " . count($sectors) . " sectors\n";
+        echo "   ✓ Seeded " . count($sectors) . " sectors across 11 categories\n";
     }
 
     private function seedSubSectors(): void
     {
         echo "🌱 Seeding sub-sectors...\n";
 
-        $subSectors = [
-            // Infrastructure (Sector 1)
-            ['id' => 1, 'sector_id' => 1, 'name' => 'Public Buildings', 'code' => 'INF-PUB', 'description' => 'Construction and maintenance of public buildings', 'display_order' => 1, 'status' => 'active'],
-            ['id' => 2, 'sector_id' => 1, 'name' => 'Drainage Systems', 'code' => 'INF-DRN', 'description' => 'Storm drains and gutters', 'display_order' => 2, 'status' => 'active'],
-            ['id' => 3, 'sector_id' => 1, 'name' => 'Markets', 'code' => 'INF-MKT', 'description' => 'Market stalls and structures', 'display_order' => 3, 'status' => 'active'],
-
-            // Healthcare (Sector 2)
-            ['id' => 4, 'sector_id' => 2, 'name' => 'Clinics & Hospitals', 'code' => 'HEA-CLN', 'description' => 'Health posts, clinics, and CHPS compounds', 'display_order' => 1, 'status' => 'active'],
-            ['id' => 5, 'sector_id' => 2, 'name' => 'Medical Equipment', 'code' => 'HEA-EQP', 'description' => 'Supply of medical tools and instruments', 'display_order' => 2, 'status' => 'active'],
-
-            // Roads & Transport (Sector 3)
-            ['id' => 6, 'sector_id' => 3, 'name' => 'Road Rehabilitation', 'code' => 'RDS-REH', 'description' => 'Re-tarmacking and grading of roads', 'display_order' => 1, 'status' => 'active'],
-            ['id' => 7, 'sector_id' => 3, 'name' => 'Pothole Repair', 'code' => 'RDS-PTH', 'description' => 'Fixing potholes and road surface damage', 'display_order' => 2, 'status' => 'active'],
-
-            // Education (Sector 4)
-            ['id' => 8, 'sector_id' => 4, 'name' => 'School Classrooms', 'code' => 'EDU-CLS', 'description' => 'Building and renovation of classroom blocks', 'display_order' => 1, 'status' => 'active'],
-            ['id' => 9, 'sector_id' => 4, 'name' => 'Libraries & Labs', 'code' => 'EDU-LIB', 'description' => 'ICT centers, libraries, and laboratories', 'display_order' => 2, 'status' => 'active'],
-
-            // Water & Sanitation (Sector 5)
-            ['id' => 10, 'sector_id' => 5, 'name' => 'Water Supply', 'code' => 'WTR-SUP', 'description' => 'Boreholes, pipes, and clean water delivery', 'display_order' => 1, 'status' => 'active'],
-            ['id' => 11, 'sector_id' => 5, 'name' => 'Sanitation Facilities', 'code' => 'WTR-SAN', 'description' => 'Public toilets and waste disposal sites', 'display_order' => 2, 'status' => 'active'],
-            ['id' => 12, 'sector_id' => 5, 'name' => 'Environmental Management', 'code' => 'WTR-ENV', 'description' => 'Clearance of weeds, bushes, and environmental care', 'display_order' => 3, 'status' => 'active'],
-
-            // Agriculture (Sector 6)
-            ['id' => 13, 'sector_id' => 6, 'name' => 'Farming Support', 'code' => 'AGR-SUP', 'description' => 'Seeds, fertilizers, and extension services', 'display_order' => 1, 'status' => 'active'],
-            
-            // Youth & Sports (Sector 7)
-            ['id' => 14, 'sector_id' => 7, 'name' => 'Sports Facilities', 'code' => 'YTH-SPT', 'description' => 'Pitches, courts, and sporting complexes', 'display_order' => 1, 'status' => 'active'],
-            
-            // Electricity (Sector 8)
-            ['id' => 15, 'sector_id' => 8, 'name' => 'Street Lighting', 'code' => 'ELC-LGT', 'description' => 'Installation and repair of street lights', 'display_order' => 1, 'status' => 'active'],
-            ['id' => 16, 'sector_id' => 8, 'name' => 'Grid Extension', 'code' => 'ELC-GRD', 'description' => 'Connecting communities to power grid', 'display_order' => 2, 'status' => 'active'],
+        $standardSubsectors = [
+            "Construction",
+            "Rehabilitation",
+            "Expansion",
+            "Maintenance",
+            "Upgrade",
+            "Supply",
+            "Capacity Building",
+            "Equipment Provision",
+            "Monitoring",
+            "Quality Improvement"
         ];
 
-        foreach ($subSectors as &$sub) {
-            $sub['created_at'] = date('Y-m-d H:i:s');
-            $sub['updated_at'] = date('Y-m-d H:i:s');
+        $waterSubsectorsMap = [
+            'Water Supply Infrastructure' => [
+                'Construction', 'Rehabilitation', 'Expansion', 'Maintenance', 'Upgrade',
+                'Equipment Provision', 'Network Extension', 'Capacity Building', 'Monitoring', 'Quality Improvement'
+            ],
+            'Rural Water Supply' => [
+                'Borehole Drilling', 'Hand Pump Installation', 'Small-Town Water Systems', 'Community Standpipes',
+                'Pipeline Extension', 'Rehabilitation', 'Maintenance', 'Community Management Training', 'Monitoring', 'Water Quality Testing'
+            ],
+            'Urban Water Supply' => [
+                'Treatment Plant Construction', 'Distribution Network Expansion', 'Pipeline Rehabilitation', 'Meter Installation',
+                'Pressure Management', 'Leakage Reduction', 'Storage Expansion', 'Maintenance', 'Monitoring', 'Service Quality Improvement'
+            ],
+            'Boreholes & Groundwater Development' => [
+                'Hydrogeological Survey', 'Borehole Drilling', 'Borehole Rehabilitation', 'Pump Installation',
+                'Solar-Powered Water Systems', 'Groundwater Recharge', 'Maintenance', 'Water Quality Testing', 'Monitoring', 'Groundwater Protection'
+            ],
+            'Water Treatment & Purification' => [
+                'Treatment Plant Construction', 'Plant Rehabilitation', 'Treatment Capacity Expansion', 'Filtration System Installation',
+                'Disinfection Systems', 'Chemical Supply', 'Equipment Provision', 'Operator Training', 'Water Quality Monitoring', 'Process Improvement'
+            ],
+            'Water Storage Systems' => [
+                'Reservoir Construction', 'Water Tank Installation', 'Elevated Tank Construction', 'Storage Capacity Expansion',
+                'Rehabilitation', 'Maintenance', 'Pumping Systems', 'Safety Inspection', 'Monitoring', 'Leakage Prevention'
+            ],
+            'Water Distribution Networks' => [
+                'Pipeline Construction', 'Network Expansion', 'Pipeline Replacement', 'Repair & Maintenance',
+                'Metering Systems', 'Pumping Stations', 'Valve Installation', 'Leakage Detection', 'Network Monitoring', 'Service Improvement'
+            ],
+            'Rainwater Harvesting' => [
+                'Household Systems', 'Institutional Systems', 'Community Storage Facilities', 'Gutter Installation',
+                'Filtration Systems', 'Storage Tank Provision', 'Maintenance', 'Public Education', 'Monitoring', 'Water Quality Testing'
+            ],
+            'Water Resources Protection' => [
+                'Watershed Protection', 'River Basin Management', 'Wetland Conservation', 'Pollution Prevention',
+                'Catchment Restoration', 'Groundwater Protection', 'Public Education', 'Regulatory Enforcement', 'Environmental Monitoring', 'Climate Resilience'
+            ],
+            'Emergency Water Services' => [
+                'Emergency Water Supply', 'Water Tanker Services', 'Temporary Storage Installation', 'Mobile Treatment Systems',
+                'Water Purification Supply', 'Borehole Restoration', 'Drought Response', 'Flood Contamination Response', 'Water Quality Monitoring', 'Emergency Preparedness'
+            ],
+        ];
+
+        $sectors = $this->fetchAll("SELECT id, name FROM sectors");
+
+        $subSectors = [];
+        $subId = 1;
+        foreach ($sectors as $sector) {
+            $prefix = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $sector['name']), 0, 3));
+            $subList = $waterSubsectorsMap[$sector['name']] ?? $standardSubsectors;
+            foreach ($subList as $index => $subName) {
+                $subSectors[] = [
+                    'id' => $subId++,
+                    'sector_id' => $sector['id'],
+                    'name' => $subName,
+                    'code' => $prefix . '-' . sprintf("%02d", $index + 1),
+                    'description' => $sector['name'] . ' - ' . $subName,
+                    'display_order' => $index + 1,
+                    'status' => 'active',
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s'),
+                ];
+            }
         }
 
         $this->table('sub_sectors')->insert($subSectors)->saveData();
-        echo "   ✓ Seeded " . count($subSectors) . " sub-sectors\n";
+        echo "   ✓ Seeded " . count($subSectors) . " sub-sectors across " . count($sectors) . " sectors\n";
     }
 
     private function seedProjects(): void

@@ -35,6 +35,7 @@ deployment:
     # Using --no-dev for production (excludes dev dependencies)
     # Using --optimize-autoloader for better performance
     # ---------------------------------------------------------------------
+    
     - cd $DEPLOYPATH && /usr/local/bin/php /opt/cpanel/composer/bin/composer install --no-dev --optimize-autoloader --no-interaction
 
     # ---------------------------------------------------------------------
