@@ -9,6 +9,7 @@ use App\Models\Agent;
 use App\Models\IssueReport;
 use App\Models\IssueReportComment;
 use App\Models\IssueReportStatusHistory;
+use App\Models\Location;
 use App\Models\Sector;
 use App\Models\SubSector;
 use App\Services\UploadService;
@@ -74,11 +75,11 @@ class IssueReportController
             $sectorId = null;
             $subSectorId = null;
             if (!empty($data['sector'])) {
-                $sector = App\Models\Sector::where('name', $data['sector'])->first();
+                $sector = Sector::where('name', $data['sector'])->first();
                 $sectorId = $sector ? $sector->id : null;
 
                 if ($sectorId && !empty($data['subsector'])) {
-                    $subSector = \App\Models\SubSector::where('name', $data['subsector'])
+                    $subSector = SubSector::where('name', $data['subsector'])
                         ->where('sector_id', $sectorId)
                         ->first();
                     $subSectorId = $subSector ? $subSector->id : null;
@@ -91,14 +92,14 @@ class IssueReportController
             $suburbId = null;
 
             if (!empty($data['location'])) {
-                $mainCommunity = \App\Models\Location::where('name', $data['location'])
+                $mainCommunity = Location::where('name', $data['location'])
                     ->where('type', 'community')
                     ->first();
                 $mainCommunityId = $mainCommunity ? $mainCommunity->id : null;
 
                 if ($mainCommunityId) {
                     if (!empty($data['smaller_community'])) {
-                        $smallerCommunity = \App\Models\Location::where('name', $data['smaller_community'])
+                        $smallerCommunity = Location::where('name', $data['smaller_community'])
                             ->where('parent_id', $mainCommunityId)
                             ->where('type', 'smaller_community')
                             ->first();
@@ -106,7 +107,7 @@ class IssueReportController
                     }
 
                     if (!empty($data['suburb'])) {
-                        $suburb = \App\Models\Location::where('name', $data['suburb'])
+                        $suburb = Location::where('name', $data['suburb'])
                             ->where('parent_id', $mainCommunityId)
                             ->where('type', 'suburb')
                             ->first();
