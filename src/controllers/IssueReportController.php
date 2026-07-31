@@ -2,19 +2,20 @@
 
 declare(strict_types=1);
 
-namespace App\controllers;
+namespace App\Controllers;
 
-use Exception;
+use App\Helper\ResponseHelper;
 use App\Models\Agent;
 use App\Models\IssueReport;
-use App\Helper\ResponseHelper;
-use App\Services\UploadService;
 use App\Models\IssueReportComment;
 use App\Models\IssueReportStatusHistory;
-use Psr\Http\Message\UploadedFileInterface;
+use App\Models\Sector;
+use App\Models\SubSector;
+use App\Services\UploadService;
+use Exception;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-
+use Psr\Http\Message\UploadedFileInterface;
 /**
  * IssueReportController
  *
@@ -73,7 +74,7 @@ class IssueReportController
             $sectorId = null;
             $subSectorId = null;
             if (!empty($data['sector'])) {
-                $sector = \App\Models\Sector::where('name', $data['sector'])->first();
+                $sector = App\Models\Sector::where('name', $data['sector'])->first();
                 $sectorId = $sector ? $sector->id : null;
 
                 if ($sectorId && !empty($data['subsector'])) {
