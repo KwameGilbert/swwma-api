@@ -2,24 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Controllers;
+namespace App\controllers;
 
+use Exception;
+use App\Models\Agent;
 use App\Models\IssueReport;
+use App\Helper\ResponseHelper;
+use App\Services\UploadService;
 use App\Models\IssueReportComment;
 use App\Models\IssueReportStatusHistory;
-use App\Models\Agent;
-use App\Services\UploadService;
-use App\Helper\ResponseHelper;
+use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\UploadedFileInterface;
-use Exception;
 
 /**
  * IssueReportController
- * 
+ *
  * Handles issue report operations.
- * - Public can submit reports
+ * - Public can submit \reports
  * - Officers and Agents can manage reports
  */
 class IssueReportController
@@ -75,7 +75,7 @@ class IssueReportController
             if (!empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $sectorId = $sector ? $sector->id : null;
-                
+
                 if ($sectorId && !empty($data['subsector'])) {
                     $subSector = \App\Models\SubSector::where('name', $data['subsector'])
                         ->where('sector_id', $sectorId)
@@ -88,13 +88,13 @@ class IssueReportController
             $mainCommunityId = null;
             $smallerCommunityId = null;
             $suburbId = null;
-            
+
             if (!empty($data['location'])) {
                 $mainCommunity = \App\Models\Location::where('name', $data['location'])
                     ->where('type', 'community')
                     ->first();
                 $mainCommunityId = $mainCommunity ? $mainCommunity->id : null;
-                
+
                 if ($mainCommunityId) {
                     if (!empty($data['smaller_community'])) {
                         $smallerCommunity = \App\Models\Location::where('name', $data['smaller_community'])
@@ -103,7 +103,7 @@ class IssueReportController
                             ->first();
                         $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
                     }
-                    
+
                     if (!empty($data['suburb'])) {
                         $suburb = \App\Models\Location::where('name', $data['suburb'])
                             ->where('parent_id', $mainCommunityId)
@@ -220,7 +220,7 @@ class IssueReportController
             $user = $request->getAttribute('user');
             // Cast to object if array
             $userObj = is_array($user) ? (object)$user : $user;
-            
+
             // Get user role from DB to be safe
             $dbUser = \App\Models\User::find($userObj->id);
             $userRole = $dbUser ? $dbUser->role : null;
@@ -240,7 +240,7 @@ class IssueReportController
                          return ResponseHelper::success($response, 'Issue reports fetched successfully', [
                             'reports' => [],
                             'pagination' => ['page' => $page, 'limit' => $limit, 'total' => 0, 'total_pages' => 0]
-                        ]);
+                         ]);
                     }
                     $query->where('status', $status);
                 } else {
@@ -278,7 +278,7 @@ class IssueReportController
                      return ResponseHelper::success($response, 'Issues fetched successfully', [
                         'reports' => [],
                         'pagination' => ['page' => $page, 'limit' => $limit, 'total' => 0, 'total_pages' => 0]
-                    ]);
+                     ]);
                 }
                 error_log("IssueReportController::index - TF Profile ID: {$tfProfile->id}");
 
@@ -293,9 +293,6 @@ class IssueReportController
                 } else {
                     $query->whereIn('status', $allowedStatuses);
                 }
-
-
-
             } else {
                 error_log("IssueReportController::index - Entering Fallback Block (Role mismatch?)");
                 // Other Roles (Agent, Public) - Secure Sandbox: See only your own submissions
@@ -435,7 +432,7 @@ class IssueReportController
 
             $data = $request->getParsedBody();
             $user = $request->getAttribute('user');
-            
+
             // Normalize user to object to handle both array and object formats safely
             $userObj = (object)$user;
             $userId = $userObj->id ?? null;
@@ -457,12 +454,12 @@ class IssueReportController
                 // 1. Acknowledge/Review (under_officer_review)
                 // 2. Forward to Admin (forwarded_to_admin)
                 // They CANNOT assign to task force or resolve directly (unless configured otherwise)
-                
+
                 $allowedOfficerStatuses = [
                     IssueReport::STATUS_UNDER_OFFICER_REVIEW,
                     IssueReport::STATUS_FORWARDED_TO_ADMIN,
                     // Maybe 'rejected' if they can reject? standard workflow suggests yes
-                    IssueReport::STATUS_REJECTED 
+                    IssueReport::STATUS_REJECTED
                 ];
 
                 if (!in_array($newStatus, $allowedOfficerStatuses)) {
@@ -472,7 +469,7 @@ class IssueReportController
 
             // Admins can do anything, BUT the system prefers they pick up from 'forwarded_to_admin'.
             // We won't block Admins from "fixing" things, but the UI should guide the flow.
-            
+
             // ----------------------------------
 
             // Update report
@@ -482,7 +479,7 @@ class IssueReportController
             if ($newStatus === IssueReport::STATUS_UNDER_OFFICER_REVIEW && !$report->acknowledged_at) {
                 // Find officer profile for the current user
                 $officer = \App\Models\Officer::findByUserId($userId);
-                
+
                 if (!$officer) {
                      return ResponseHelper::error($response, 'Officer profile not found for this user', 403);
                 }
@@ -624,6 +621,11 @@ class IssueReportController
                 return ResponseHelper::error($response, 'You do not have permission to submit reports', 403);
             }
 
+            // Normalize location field from community payload if missing
+            if (empty($data['location']) && !empty($data['community'])) {
+                $data['location'] = $data['community'];
+            }
+
             // Validation
             if (empty($data['title'])) {
                 return ResponseHelper::error($response, 'Title is required', 400);
@@ -658,7 +660,7 @@ class IssueReportController
             if (!empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $sectorId = $sector ? $sector->id : null;
-                
+
                 if ($sectorId && !empty($data['subsector'])) {
                     $subSector = \App\Models\SubSector::where('name', $data['subsector'])
                         ->where('sector_id', $sectorId)
@@ -671,13 +673,13 @@ class IssueReportController
             $mainCommunityId = null;
             $smallerCommunityId = null;
             $suburbId = null;
-            
+
             if (!empty($data['location'])) {
                 $mainCommunity = \App\Models\Location::where('name', $data['location'])
                     ->where('type', 'community')
                     ->first();
                 $mainCommunityId = $mainCommunity ? $mainCommunity->id : null;
-                
+
                 if ($mainCommunityId) {
                     if (!empty($data['smaller_community'])) {
                         $smallerCommunity = \App\Models\Location::where('name', $data['smaller_community'])
@@ -686,7 +688,7 @@ class IssueReportController
                             ->first();
                         $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
                     }
-                    
+
                     if (!empty($data['suburb'])) {
                         $suburb = \App\Models\Location::where('name', $data['suburb'])
                             ->where('parent_id', $mainCommunityId)
@@ -849,14 +851,28 @@ class IssueReportController
             // Enrich description with extra fields
             $enrichedDescription = $data['description'];
             $extras = [];
-            if (!empty($data['issue_type'])) $extras[] = "Issue Type: " . $data['issue_type'];
-            if (!empty($data['sector'])) $extras[] = "Sector: " . $data['sector'];
-            if (!empty($data['subsector'])) $extras[] = "Subsector: " . $data['subsector'];
-            if (!empty($data['people_affected'])) $extras[] = "People Affected: " . $data['people_affected'];
-            if (!empty($data['reporter_gender'])) $extras[] = "Gender: " . $data['reporter_gender'];
-            if (!empty($data['reporter_address'])) $extras[] = "Address: " . $data['reporter_address'];
-            if (!empty($data['additional_notes'])) $extras[] = "Notes: " . $data['additional_notes'];
-            
+            if (!empty($data['issue_type'])) {
+                $extras[] = "Issue Type: " . $data['issue_type'];
+            }
+            if (!empty($data['sector'])) {
+                $extras[] = "Sector: " . $data['sector'];
+            }
+            if (!empty($data['subsector'])) {
+                $extras[] = "Subsector: " . $data['subsector'];
+            }
+            if (!empty($data['people_affected'])) {
+                $extras[] = "People Affected: " . $data['people_affected'];
+            }
+            if (!empty($data['reporter_gender'])) {
+                $extras[] = "Gender: " . $data['reporter_gender'];
+            }
+            if (!empty($data['reporter_address'])) {
+                $extras[] = "Address: " . $data['reporter_address'];
+            }
+            if (!empty($data['additional_notes'])) {
+                $extras[] = "Notes: " . $data['additional_notes'];
+            }
+
             if (!empty($extras)) {
                 $enrichedDescription .= "\n\n-- Additional Details --\n" . implode("\n", $extras);
             }
@@ -979,43 +995,53 @@ class IssueReportController
 
             // Check permissions: Agent can only edit issues they submitted
             // And only if status is submitted, rejected, or pending
-            // Also allow 'assessment_submitted' if they need to correct details before full approval? 
+            // Also allow 'assessment_submitted' if they need to correct details before full approval?
             // Sticking to safe initial statuses + rejected.
-            
+
             // For now, strict ownership check for agents
             // We can relax this if agents work in teams, but usually agents are individual.
-            // However, the report might not store submitted_by_agent_id directly if not set? 
+            // However, the report might not store submitted_by_agent_id directly if not set?
             // IssueReport model has submitted_by_agent_id? Yes?
             // "agentSubmit" sets 'submitted_by_agent_id' => $agent->id ??
-            // Let's check agentSubmit to be sure. 
+            // Let's check agentSubmit to be sure.
             // It does not seem to define 'submitted_by_agent_id' in previous snippets, let's assume it does or use user_id check.
-            // Actually, let's check ownership via report's relationship or a field. 
+            // Actually, let's check ownership via report's relationship or a field.
             // Assuming strict check is okay for now or just allow if in valid status and agent role.
-            
+
             // Strict ownership check for agents
             if ($report->submitted_by_agent_id !== $agent->id) {
                 return ResponseHelper::error($response, 'Access denied: You can only edit your own reports', 403);
             }
 
             if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_REJECTED])) {
-                return ResponseHelper::error($response, 'Cannot edit issue in current status', 400); 
+                return ResponseHelper::error($response, 'Cannot edit issue in current status', 400);
             }
 
             $data = $request->getParsedBody();
 
             // Fields allowed to update
             $updateData = [];
-            if (!empty($data['title'])) $updateData['title'] = $data['title'];
-            if (!empty($data['description'])) $updateData['description'] = $data['description'];
-            if (!empty($data['location'])) $updateData['location'] = $data['location'];
-            if (!empty($data['category'])) $updateData['category'] = $data['category'];
-            if (!empty($data['priority'])) $updateData['priority'] = $data['priority'];
-            
+            if (!empty($data['title'])) {
+                $updateData['title'] = $data['title'];
+            }
+            if (!empty($data['description'])) {
+                $updateData['description'] = $data['description'];
+            }
+            if (!empty($data['location'])) {
+                $updateData['location'] = $data['location'];
+            }
+            if (!empty($data['category'])) {
+                $updateData['category'] = $data['category'];
+            }
+            if (!empty($data['priority'])) {
+                $updateData['priority'] = $data['priority'];
+            }
+
             // Re-resolve sector/subsector if provided
             if (!empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $updateData['sector_id'] = $sector ? $sector->id : null;
-                
+
                 if ($updateData['sector_id'] && !empty($data['subsector'])) {
                     $subSector = \App\Models\SubSector::where('name', $data['subsector'])
                         ->where('sector_id', $updateData['sector_id'])
@@ -1038,7 +1064,6 @@ class IssueReportController
             return ResponseHelper::success($response, 'Issue report updated successfully', [
                 'report' => $report->fresh()->toPublicArray()
             ]);
-
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update issue report', 500, $e->getMessage());
         }
@@ -1068,15 +1093,14 @@ class IssueReportController
             if ($report->submitted_by_agent_id !== $agent->id) {
                 return ResponseHelper::error($response, 'Access denied: You can only delete your own reports', 403);
             }
-            
+
             if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_REJECTED])) {
-                return ResponseHelper::error($response, 'Cannot delete issue that has been processed', 400); 
+                return ResponseHelper::error($response, 'Cannot delete issue that has been processed', 400);
             }
 
             $report->delete();
 
             return ResponseHelper::success($response, 'Issue report deleted successfully');
-
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to delete issue report', 500, $e->getMessage());
         }
@@ -1108,30 +1132,40 @@ class IssueReportController
             // Or maybe 'under_officer_review' if they are the one reviewing it and want to fix typos?
             // For now, let's stick to the plan: Officer who submitted it (or maybe any officer if it's their jurisdiction?)
             // Safest: Officer who submitted it.
-            
+
             // Check permissions: Allow any officer to edit if status is appropriate
             // This allows officers to collaborate or fix issues submitted by others in their jurisdiction.
-            
+
             // Allow editing in early stages or if under officer review
             if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_REJECTED, IssueReport::STATUS_UNDER_OFFICER_REVIEW])) {
-                return ResponseHelper::error($response, 'Cannot edit issue in current status', 400); 
+                return ResponseHelper::error($response, 'Cannot edit issue in current status', 400);
             }
 
             $data = $request->getParsedBody();
 
             // Fields allowed to update
             $updateData = [];
-            if (!empty($data['title'])) $updateData['title'] = $data['title'];
-            if (!empty($data['description'])) $updateData['description'] = $data['description'];
-            if (!empty($data['location'])) $updateData['location'] = $data['location'];
-            if (!empty($data['category'])) $updateData['category'] = $data['category'];
-            if (!empty($data['priority'])) $updateData['priority'] = $data['priority'];
-            
+            if (!empty($data['title'])) {
+                $updateData['title'] = $data['title'];
+            }
+            if (!empty($data['description'])) {
+                $updateData['description'] = $data['description'];
+            }
+            if (!empty($data['location'])) {
+                $updateData['location'] = $data['location'];
+            }
+            if (!empty($data['category'])) {
+                $updateData['category'] = $data['category'];
+            }
+            if (!empty($data['priority'])) {
+                $updateData['priority'] = $data['priority'];
+            }
+
             // Re-resolve sector/subsector if provided
             if (!empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $updateData['sector_id'] = $sector ? $sector->id : null;
-                
+
                 if ($updateData['sector_id'] && !empty($data['subsector'])) {
                     $subSector = \App\Models\SubSector::where('name', $data['subsector'])
                         ->where('sector_id', $updateData['sector_id'])
@@ -1154,7 +1188,6 @@ class IssueReportController
             return ResponseHelper::success($response, 'Issue report updated successfully', [
                 'report' => $report->fresh()->toPublicArray()
             ]);
-
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to update issue report', 500, $e->getMessage());
         }
@@ -1186,20 +1219,19 @@ class IssueReportController
             // }
 
             if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_REJECTED, IssueReport::STATUS_UNDER_OFFICER_REVIEW])) {
-                return ResponseHelper::error($response, 'Cannot delete issue that has been processed', 400); 
+                return ResponseHelper::error($response, 'Cannot delete issue that has been processed', 400);
             }
 
             // Soft delete or Hard delete? Model doesn't have SoftDeletes trait visible, so assuming hard delete.
             // Or we can just set status to 'closed' / 'void'?
             // User requested "Delete", let's do hard delete to clean up.
-            
-            // Delete associated records first? Eloquent usually handles cascade if set in DB, 
+
+            // Delete associated records first? Eloquent usually handles cascade if set in DB,
             // but for safety we might want to manually clean up or just delete the report.
             // Let's try delete.
             $report->delete();
 
             return ResponseHelper::success($response, 'Issue report deleted successfully');
-
         } catch (Exception $e) {
             return ResponseHelper::error($response, 'Failed to delete issue report', 500, $e->getMessage());
         }
@@ -1324,7 +1356,7 @@ class IssueReportController
             switch ($action) {
                 case 'approve':
                     $assessment->approve((int)$user->id, $notes);
-                    // Stay as assessment_submitted or move to resources_allocated? 
+                    // Stay as assessment_submitted or move to resources_allocated?
                     // Usually wait for explicit resource allocation.
                     break;
                 case 'reject':
@@ -1332,7 +1364,7 @@ class IssueReportController
                     // Revert issue status so Task Force can see and resubmit
                     $report->status = IssueReport::STATUS_ASSESSMENT_IN_PROGRESS;
                     $report->save();
-                    
+
                     IssueReportStatusHistory::logChange(
                         $report->id,
                         (int)$user->id,

@@ -22,22 +22,24 @@ return function (App $app) {
     // $app->post('/v1/issues', [$controller, 'submit']);
     // $app->get('/v1/issues/track/{caseId}', [$controller, 'track']);
 
-    // Agent routes (require agent role)
+    // Agent routes (require agent, web_admin, admin, or officer role)
     $app->group('/v1/agent/issues', function ($group) use ($controller) {
         $group->post('', [$controller, 'agentSubmit']);
+        $group->post('/', [$controller, 'agentSubmit']);
         $group->get('/{id}', [$controller, 'agentShow']);
         $group->put('/{id}', [$controller, 'agentUpdate']);
         $group->delete('/{id}', [$controller, 'agentDelete']);
-    })->add(new RoleMiddleware(['agent']))->add($authMiddleware);
+    })->add(new RoleMiddleware(['agent', 'web_admin', 'admin', 'officer']))->add($authMiddleware);
 
-    // Officer routes (require officer role)
+    // Officer routes (require officer, web_admin, or admin role)
     $app->group('/v1/officer/issues', function ($group) use ($controller) {
         $group->get('', [$controller, 'index']);
         $group->post('', [$controller, 'officerSubmit']);
+        $group->post('/', [$controller, 'officerSubmit']);
         $group->put('/{id}', [$controller, 'officerUpdate']);
         $group->delete('/{id}', [$controller, 'officerDelete']);
         $group->put('/{id}/forward', [$controller, 'officerForward']);
-    })->add(new RoleMiddleware(['officer']))->add($authMiddleware);
+    })->add(new RoleMiddleware(['officer', 'web_admin', 'admin']))->add($authMiddleware);
 
     // Admin routes - Viewing & Basic Management (web_admin, admin, officer or task_force)
     $app->group('/v1/admin/issues', function ($group) use ($controller) {
