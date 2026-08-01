@@ -25,7 +25,6 @@ return function (App $app) {
     // Agent routes (require agent, web_admin, admin, or officer role)
     $app->group('/v1/agent/issues', function ($group) use ($controller) {
         $group->post('', [$controller, 'agentSubmit']);
-        $group->post('/', [$controller, 'agentSubmit']);
         $group->get('/{id}', [$controller, 'agentShow']);
         $group->put('/{id}', [$controller, 'agentUpdate']);
         $group->delete('/{id}', [$controller, 'agentDelete']);
@@ -36,7 +35,6 @@ return function (App $app) {
         $group->get('', [$controller, 'index']);
         $group->get('/{id}', [$controller, 'show']);
         $group->post('', [$controller, 'officerSubmit']);
-        $group->post('/', [$controller, 'officerSubmit']);
         $group->put('/{id}', [$controller, 'officerUpdate']);
         $group->delete('/{id}', [$controller, 'officerDelete']);
         $group->put('/{id}/forward', [$controller, 'officerForward']);

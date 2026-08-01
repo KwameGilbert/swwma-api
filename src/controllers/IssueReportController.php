@@ -71,48 +71,56 @@ class IssueReportController
                 }
             }
 
-            // Resolve sector and sub-sector IDs from names
-            $sectorId = null;
-            $subSectorId = null;
-            if (!empty($data['sector'])) {
+            // Extract constituent / reporter details (handling both constituent_* and reporter_* keys)
+            $constituentName = $data['constituent_name'] ?? $data['reporter_name'] ?? null;
+            $constituentEmail = $data['constituent_email'] ?? $data['reporter_email'] ?? null;
+            $constituentPhone = $data['constituent_phone'] ?? $data['constituent_contact'] ?? $data['reporter_phone'] ?? null;
+            $constituentGender = $data['constituent_gender'] ?? $data['reporter_gender'] ?? null;
+            $constituentAddress = $data['constituent_address'] ?? $data['reporter_address'] ?? null;
+            $additionalNotes = $data['additional_notes'] ?? $data['details'] ?? null;
+
+            // Resolve sector and sub-sector IDs (check direct numeric IDs first)
+            $sectorId = !empty($data['sector_id']) && is_numeric($data['sector_id']) ? (int)$data['sector_id'] : null;
+            $subSectorId = !empty($data['sub_sector_id']) && is_numeric($data['sub_sector_id']) ? (int)$data['sub_sector_id'] : null;
+
+            if (!$sectorId && !empty($data['sector'])) {
                 $sector = Sector::where('name', $data['sector'])->first();
                 $sectorId = $sector ? $sector->id : null;
-
-                if ($sectorId && !empty($data['subsector'])) {
-                    $subSector = SubSector::where('name', $data['subsector'])
-                        ->where('sector_id', $sectorId)
-                        ->first();
-                    $subSectorId = $subSector ? $subSector->id : null;
-                }
+            }
+            if ($sectorId && !$subSectorId && !empty($data['subsector'])) {
+                $subSector = SubSector::where('name', $data['subsector'])
+                    ->where('sector_id', $sectorId)
+                    ->first();
+                $subSectorId = $subSector ? $subSector->id : null;
             }
 
-            // Resolve location hierarchy IDs from names
-            $mainCommunityId = null;
-            $smallerCommunityId = null;
-            $suburbId = null;
+            // Resolve location hierarchy IDs (check direct numeric IDs first)
+            $mainCommunityId = !empty($data['community_id']) && is_numeric($data['community_id']) ? (int)$data['community_id'] : (!empty($data['main_community_id']) && is_numeric($data['main_community_id']) ? (int)$data['main_community_id'] : null);
+            $smallerCommunityId = !empty($data['smaller_community_id']) && is_numeric($data['smaller_community_id']) ? (int)$data['smaller_community_id'] : null;
+            $suburbId = !empty($data['suburb_id']) && is_numeric($data['suburb_id']) ? (int)$data['suburb_id'] : null;
 
-            if (!empty($data['location'])) {
+            if (!$mainCommunityId && !empty($data['location'])) {
                 $mainCommunity = Location::where('name', $data['location'])
                     ->where('type', 'community')
                     ->first();
                 $mainCommunityId = $mainCommunity ? $mainCommunity->id : null;
+            }
 
-                if ($mainCommunityId) {
-                    if (!empty($data['smaller_community'])) {
-                        $smallerCommunity = Location::where('name', $data['smaller_community'])
-                            ->where('parent_id', $mainCommunityId)
-                            ->where('type', 'smaller_community')
-                            ->first();
-                        $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
-                    }
+            if ($mainCommunityId) {
+                if (!$smallerCommunityId && !empty($data['smaller_community'])) {
+                    $smallerCommunity = Location::where('name', $data['smaller_community'])
+                        ->where('parent_id', $mainCommunityId)
+                        ->where('type', 'smaller_community')
+                        ->first();
+                    $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
+                }
 
-                    if (!empty($data['suburb'])) {
-                        $suburb = Location::where('name', $data['suburb'])
-                            ->where('parent_id', $mainCommunityId)
-                            ->where('type', 'suburb')
-                            ->first();
-                        $suburbId = $suburb ? $suburb->id : null;
-                    }
+                if (!$suburbId && !empty($data['suburb'])) {
+                    $suburb = Location::where('name', $data['suburb'])
+                        ->where('parent_id', $mainCommunityId)
+                        ->where('type', 'suburb')
+                        ->first();
+                    $suburbId = $suburb ? $suburb->id : null;
                 }
             }
 
@@ -121,14 +129,13 @@ class IssueReportController
                 'title' => $data['title'],
                 'description' => $data['description'],
                 'category' => $data['category'] ?? null,
-                // NEW: Classification fields
                 'sector_id' => $sectorId,
                 'sub_sector_id' => $subSectorId,
                 'issue_type' => $data['issue_type'] ?? 'community_based',
                 'affected_people_count' => $data['people_affected'] ?? null,
-                // Location (legacy VARCHAR field)
+                'estimated_budget' => !empty($data['estimated_budget']) && is_numeric($data['estimated_budget']) ? (float)$data['estimated_budget'] : null,
                 'location' => $data['location'],
-                // NEW: Location hierarchy
+                'specific_location' => $data['specific_location'] ?? $data['cottage'] ?? null,
                 'main_community_id' => $mainCommunityId,
                 'smaller_community_id' => $smallerCommunityId,
                 'suburb_id' => $suburbId,
@@ -136,16 +143,17 @@ class IssueReportController
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
                 'images' => $imagesJson,
-                // NEW: Constituent information
-                'constituent_name' => $data['reporter_name'] ?? null,
-                'constituent_email' => $data['reporter_email'] ?? null,
-                'constituent_contact' => $data['reporter_phone'] ?? null,
-                'constituent_gender' => $data['reporter_gender'] ?? null,
-                'constituent_address' => $data['reporter_address'] ?? null,
-                // Legacy fields for backward compatibility
-                'reporter_name' => $data['reporter_name'] ?? null,
-                'reporter_email' => $data['reporter_email'] ?? null,
-                'reporter_phone' => $data['reporter_phone'] ?? null,
+                'constituent_name' => $constituentName,
+                'constituent_email' => $constituentEmail,
+                'constituent_contact' => $constituentPhone,
+                'constituent_gender' => $constituentGender,
+                'constituent_address' => $constituentAddress,
+                'reporter_name' => $constituentName,
+                'reporter_email' => $constituentEmail,
+                'reporter_phone' => $constituentPhone,
+                'reporter_gender' => $constituentGender,
+                'reporter_address' => $constituentAddress,
+                'additional_notes' => $additionalNotes,
                 'status' => IssueReport::STATUS_SUBMITTED,
                 'priority' => $data['priority'] ?? IssueReport::PRIORITY_MEDIUM,
             ]);
@@ -298,7 +306,15 @@ class IssueReportController
             } else {
                 error_log("IssueReportController::index - Entering Fallback Block (Role mismatch?)");
                 // Other Roles (Agent, Public) - Secure Sandbox: See only your own submissions
-                $query->where('submitted_by', $userObj->id); // Assuming submitted_by matches user_id, or check schema
+                $query->where(function($q) use ($userObj) {
+                    $q->where('user_id', $userObj->id)
+                      ->orWhere('submitted_by_agent_id', function($sub) use ($userObj) {
+                          $sub->select('id')->from('agents')->where('user_id', $userObj->id);
+                      })
+                      ->orWhere('submitted_by_officer_id', function($sub) use ($userObj) {
+                          $sub->select('id')->from('officers')->where('user_id', $userObj->id);
+                      });
+                });
                 if ($status) {
                     $query->where('status', $status);
                 }
@@ -399,16 +415,29 @@ class IssueReportController
             $reportArray['sector'] = $report->sector?->name ?? ($reportArray['sector'] ?? null);
             $reportArray['subsector'] = $report->subSector?->name ?? ($reportArray['subsector'] ?? null);
 
+            $reportArray['community'] = $report->mainCommunity?->name ?? ($reportArray['location'] ?? null);
             $reportArray['location'] = $report->mainCommunity?->name ?? ($reportArray['location'] ?? null);
             $reportArray['smaller_community'] = $report->smallerCommunity?->name ?? ($reportArray['smaller_community'] ?? null);
             $reportArray['suburb'] = $report->suburb?->name ?? ($reportArray['suburb'] ?? null);
             $reportArray['cottage'] = $report->cottage?->name ?? ($reportArray['cottage'] ?? null);
+
+            $reportArray['people_affected'] = $report->affected_people_count ?? ($reportArray['people_affected'] ?? null);
 
             $reportArray['reporter_name'] = $report->reporter_name ?: $report->constituent_name;
             $reportArray['reporter_phone'] = $report->reporter_phone ?: $report->constituent_contact;
             $reportArray['reporter_email'] = $report->reporter_email ?: $report->constituent_email;
             $reportArray['reporter_gender'] = $report->constituent_gender ?? ($reportArray['reporter_gender'] ?? null);
             $reportArray['reporter_address'] = $report->constituent_address ?? ($reportArray['reporter_address'] ?? null);
+
+            // Populate reporting agent info if available
+            if ($report->submittedByAgent) {
+                $reportArray['agent'] = [
+                    'id' => $report->submittedByAgent->id,
+                    'name' => $report->submittedByAgent->user?->name,
+                    'email' => $report->submittedByAgent->user?->email,
+                    'phone' => $report->submittedByAgent->user?->phone,
+                ];
+            }
 
             return ResponseHelper::success($response, 'Issue report fetched successfully', [
                 'report' => $reportArray,
@@ -656,81 +685,90 @@ class IssueReportController
                 }
             }
 
-            // Resolve sector and sub-sector IDs from names
-            $sectorId = null;
-            $subSectorId = null;
-            if (!empty($data['sector'])) {
+            // Extract constituent / reporter details (handling both constituent_* and reporter_* keys)
+            $constituentName = $data['constituent_name'] ?? $data['reporter_name'] ?? null;
+            $constituentEmail = $data['constituent_email'] ?? $data['reporter_email'] ?? null;
+            $constituentPhone = $data['constituent_phone'] ?? $data['constituent_contact'] ?? $data['reporter_phone'] ?? null;
+            $constituentGender = $data['constituent_gender'] ?? $data['reporter_gender'] ?? null;
+            $constituentAddress = $data['constituent_address'] ?? $data['reporter_address'] ?? null;
+            $additionalNotes = $data['additional_notes'] ?? $data['details'] ?? null;
+
+            // Resolve sector and sub-sector IDs (check direct numeric IDs first)
+            $sectorId = !empty($data['sector_id']) && is_numeric($data['sector_id']) ? (int)$data['sector_id'] : null;
+            $subSectorId = !empty($data['sub_sector_id']) && is_numeric($data['sub_sector_id']) ? (int)$data['sub_sector_id'] : null;
+
+            if (!$sectorId && !empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $sectorId = $sector ? $sector->id : null;
-
-                if ($sectorId && !empty($data['subsector'])) {
-                    $subSector = \App\Models\SubSector::where('name', $data['subsector'])
-                        ->where('sector_id', $sectorId)
-                        ->first();
-                    $subSectorId = $subSector ? $subSector->id : null;
-                }
+            }
+            if ($sectorId && !$subSectorId && !empty($data['subsector'])) {
+                $subSector = \App\Models\SubSector::where('name', $data['subsector'])
+                    ->where('sector_id', $sectorId)
+                    ->first();
+                $subSectorId = $subSector ? $subSector->id : null;
             }
 
-            // Resolve location hierarchy IDs from names
-            $mainCommunityId = null;
-            $smallerCommunityId = null;
-            $suburbId = null;
+            // Resolve location hierarchy IDs (check direct numeric IDs first)
+            $mainCommunityId = !empty($data['community_id']) && is_numeric($data['community_id']) ? (int)$data['community_id'] : (!empty($data['main_community_id']) && is_numeric($data['main_community_id']) ? (int)$data['main_community_id'] : null);
+            $smallerCommunityId = !empty($data['smaller_community_id']) && is_numeric($data['smaller_community_id']) ? (int)$data['smaller_community_id'] : null;
+            $suburbId = !empty($data['suburb_id']) && is_numeric($data['suburb_id']) ? (int)$data['suburb_id'] : null;
 
-            if (!empty($data['location'])) {
+            if (!$mainCommunityId && !empty($data['location'])) {
                 $mainCommunity = \App\Models\Location::where('name', $data['location'])
                     ->where('type', 'community')
                     ->first();
                 $mainCommunityId = $mainCommunity ? $mainCommunity->id : null;
+            }
 
-                if ($mainCommunityId) {
-                    if (!empty($data['smaller_community'])) {
-                        $smallerCommunity = \App\Models\Location::where('name', $data['smaller_community'])
-                            ->where('parent_id', $mainCommunityId)
-                            ->where('type', 'smaller_community')
-                            ->first();
-                        $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
-                    }
+            if ($mainCommunityId) {
+                if (!$smallerCommunityId && !empty($data['smaller_community'])) {
+                    $smallerCommunity = \App\Models\Location::where('name', $data['smaller_community'])
+                        ->where('parent_id', $mainCommunityId)
+                        ->where('type', 'smaller_community')
+                        ->first();
+                    $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
+                }
 
-                    if (!empty($data['suburb'])) {
-                        $suburb = \App\Models\Location::where('name', $data['suburb'])
-                            ->where('parent_id', $mainCommunityId)
-                            ->where('type', 'suburb')
-                            ->first();
-                        $suburbId = $suburb ? $suburb->id : null;
-                    }
+                if (!$suburbId && !empty($data['suburb'])) {
+                    $suburb = \App\Models\Location::where('name', $data['suburb'])
+                        ->where('parent_id', $mainCommunityId)
+                        ->where('type', 'suburb')
+                        ->first();
+                    $suburbId = $suburb ? $suburb->id : null;
                 }
             }
 
             $report = IssueReport::create([
                 'case_id' => IssueReport::generateCaseId(),
+                'user_id' => $user->id ?? null,
                 'title' => $data['title'],
                 'description' => $data['description'],
                 'category' => $data['category'] ?? null,
-                // NEW: Classification fields
                 'sector_id' => $sectorId,
                 'sub_sector_id' => $subSectorId,
                 'issue_type' => $data['issue_type'] ?? 'community_based',
                 'affected_people_count' => $data['people_affected'] ?? null,
-                // Location (legacy VARCHAR field)
+                'estimated_budget' => !empty($data['estimated_budget']) && is_numeric($data['estimated_budget']) ? (float)$data['estimated_budget'] : null,
                 'location' => $data['location'],
-                // NEW: Location hierarchy
+                'specific_location' => $data['specific_location'] ?? $data['cottage'] ?? null,
                 'main_community_id' => $mainCommunityId,
                 'smaller_community_id' => $smallerCommunityId,
                 'suburb_id' => $suburbId,
-                'cottage_id' => null, // Not used in form yet
+                'cottage_id' => null,
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
                 'images' => $imagesJson,
-                // NEW: Constituent information (using new field names)
-                'constituent_name' => $data['reporter_name'] ?? null,
-                'constituent_email' => $data['reporter_email'] ?? null,
-                'constituent_contact' => $data['reporter_phone'] ?? null,
-                'constituent_gender' => $data['reporter_gender'] ?? null,
-                'constituent_address' => $data['reporter_address'] ?? null,
-                // Legacy fields for backward compatibility
-                'reporter_name' => $data['reporter_name'] ?? null,
-                'reporter_email' => $data['reporter_email'] ?? null,
-                'reporter_phone' => $data['reporter_phone'] ?? null,
+                'constituent_name' => $constituentName,
+                'constituent_email' => $constituentEmail,
+                'constituent_contact' => $constituentPhone,
+                'constituent_gender' => $constituentGender,
+                'constituent_address' => $constituentAddress,
+                'reporter_name' => $constituentName,
+                'reporter_email' => $constituentEmail,
+                'reporter_phone' => $constituentPhone,
+                'reporter_gender' => $constituentGender,
+                'reporter_address' => $constituentAddress,
+                'additional_notes' => $additionalNotes,
                 'submitted_by_agent_id' => $agent->id,
                 'status' => IssueReport::STATUS_SUBMITTED,
                 'priority' => $data['priority'] ?? IssueReport::PRIORITY_MEDIUM,
@@ -879,63 +917,72 @@ class IssueReportController
                 $enrichedDescription .= "\n\n-- Additional Details --\n" . implode("\n", $extras);
             }
 
-            // Resolve sector and sub-sector IDs from names
-            $sectorId = null;
-            $subSectorId = null;
-            if (!empty($data['sector'])) {
+            // Extract constituent / reporter details (handling both constituent_* and reporter_* keys)
+            $constituentName = $data['constituent_name'] ?? $data['reporter_name'] ?? null;
+            $constituentEmail = $data['constituent_email'] ?? $data['reporter_email'] ?? null;
+            $constituentPhone = $data['constituent_phone'] ?? $data['constituent_contact'] ?? $data['reporter_phone'] ?? null;
+            $constituentGender = $data['constituent_gender'] ?? $data['reporter_gender'] ?? null;
+            $constituentAddress = $data['constituent_address'] ?? $data['reporter_address'] ?? null;
+            $additionalNotes = $data['additional_notes'] ?? $data['details'] ?? null;
+
+            // Resolve sector and sub-sector IDs (check direct numeric IDs first)
+            $sectorId = !empty($data['sector_id']) && is_numeric($data['sector_id']) ? (int)$data['sector_id'] : null;
+            $subSectorId = !empty($data['sub_sector_id']) && is_numeric($data['sub_sector_id']) ? (int)$data['sub_sector_id'] : null;
+
+            if (!$sectorId && !empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $sectorId = $sector ? $sector->id : null;
-
-                if ($sectorId && !empty($data['subsector'])) {
-                    $subSector = \App\Models\SubSector::where('name', $data['subsector'])
-                        ->where('sector_id', $sectorId)
-                        ->first();
-                    $subSectorId = $subSector ? $subSector->id : null;
-                }
+            }
+            if ($sectorId && !$subSectorId && !empty($data['subsector'])) {
+                $subSector = \App\Models\SubSector::where('name', $data['subsector'])
+                    ->where('sector_id', $sectorId)
+                    ->first();
+                $subSectorId = $subSector ? $subSector->id : null;
             }
 
-            // Resolve location hierarchy IDs from names
-            $mainCommunityId = null;
-            $smallerCommunityId = null;
-            $suburbId = null;
+            // Resolve location hierarchy IDs (check direct numeric IDs first)
+            $mainCommunityId = !empty($data['community_id']) && is_numeric($data['community_id']) ? (int)$data['community_id'] : (!empty($data['main_community_id']) && is_numeric($data['main_community_id']) ? (int)$data['main_community_id'] : null);
+            $smallerCommunityId = !empty($data['smaller_community_id']) && is_numeric($data['smaller_community_id']) ? (int)$data['smaller_community_id'] : null;
+            $suburbId = !empty($data['suburb_id']) && is_numeric($data['suburb_id']) ? (int)$data['suburb_id'] : null;
 
-            if (!empty($data['location'])) {
+            if (!$mainCommunityId && !empty($data['location'])) {
                 $mainCommunity = \App\Models\Location::where('name', $data['location'])
                     ->where('type', 'community')
                     ->first();
                 $mainCommunityId = $mainCommunity ? $mainCommunity->id : null;
+            }
 
-                if ($mainCommunityId) {
-                    if (!empty($data['smaller_community'])) {
-                        $smallerCommunity = \App\Models\Location::where('name', $data['smaller_community'])
-                            ->where('parent_id', $mainCommunityId)
-                            ->where('type', 'smaller_community')
-                            ->first();
-                        $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
-                    }
+            if ($mainCommunityId) {
+                if (!$smallerCommunityId && !empty($data['smaller_community'])) {
+                    $smallerCommunity = \App\Models\Location::where('name', $data['smaller_community'])
+                        ->where('parent_id', $mainCommunityId)
+                        ->where('type', 'smaller_community')
+                        ->first();
+                    $smallerCommunityId = $smallerCommunity ? $smallerCommunity->id : null;
+                }
 
-                    if (!empty($data['suburb'])) {
-                        $suburb = \App\Models\Location::where('name', $data['suburb'])
-                            ->where('parent_id', $mainCommunityId)
-                            ->where('type', 'suburb')
-                            ->first();
-                        $suburbId = $suburb ? $suburb->id : null;
-                    }
+                if (!$suburbId && !empty($data['suburb'])) {
+                    $suburb = \App\Models\Location::where('name', $data['suburb'])
+                        ->where('parent_id', $mainCommunityId)
+                        ->where('type', 'suburb')
+                        ->first();
+                    $suburbId = $suburb ? $suburb->id : null;
                 }
             }
 
             $report = IssueReport::create([
                 'case_id' => IssueReport::generateCaseId(),
+                'user_id' => $user->id ?? null,
                 'title' => $data['title'],
                 'description' => $enrichedDescription,
                 'category' => $data['category'] ?? null,
-                // Classification fields
                 'sector_id' => $sectorId,
                 'sub_sector_id' => $subSectorId,
                 'issue_type' => $data['issue_type'] ?? 'community_based',
                 'affected_people_count' => $data['people_affected'] ?? null,
+                'estimated_budget' => !empty($data['estimated_budget']) && is_numeric($data['estimated_budget']) ? (float)$data['estimated_budget'] : null,
                 'location' => $data['location'],
-                // Location hierarchy
+                'specific_location' => $data['specific_location'] ?? $data['cottage'] ?? null,
                 'main_community_id' => $mainCommunityId,
                 'smaller_community_id' => $smallerCommunityId,
                 'suburb_id' => $suburbId,
@@ -943,17 +990,19 @@ class IssueReportController
                 'latitude' => $data['latitude'] ?? null,
                 'longitude' => $data['longitude'] ?? null,
                 'images' => $imagesJson,
-                // Constituent information
-                'constituent_name' => $data['reporter_name'] ?? null,
-                'constituent_email' => $data['reporter_email'] ?? null,
-                'constituent_contact' => $data['reporter_phone'] ?? null,
-                'constituent_gender' => $data['reporter_gender'] ?? null,
-                'constituent_address' => $data['reporter_address'] ?? null,
-                // Legacy fields for backward compatibility
-                'reporter_name' => $data['reporter_name'] ?? null,
-                'reporter_email' => $data['reporter_email'] ?? null,
-                'reporter_phone' => $data['reporter_phone'] ?? null,
+                'constituent_name' => $constituentName,
+                'constituent_email' => $constituentEmail,
+                'constituent_contact' => $constituentPhone,
+                'constituent_gender' => $constituentGender,
+                'constituent_address' => $constituentAddress,
+                'reporter_name' => $constituentName,
+                'reporter_email' => $constituentEmail,
+                'reporter_phone' => $constituentPhone,
+                'reporter_gender' => $constituentGender,
+                'reporter_address' => $constituentAddress,
+                'additional_notes' => $additionalNotes,
                 'submitted_by_officer_id' => $officer->id,
+                'assigned_agent_id' => !empty($data['agent_id']) ? (int)$data['agent_id'] : null,
                 'status' => IssueReport::STATUS_SUBMITTED,
                 'priority' => $data['priority'] ?? IssueReport::PRIORITY_MEDIUM,
             ]);
@@ -1038,18 +1087,73 @@ class IssueReportController
             if (!empty($data['priority'])) {
                 $updateData['priority'] = $data['priority'];
             }
+            if (isset($data['issue_type'])) {
+                $updateData['issue_type'] = $data['issue_type'];
+            }
+            if (isset($data['people_affected'])) {
+                $updateData['affected_people_count'] = $data['people_affected'];
+            }
+            if (isset($data['estimated_budget']) && is_numeric($data['estimated_budget'])) {
+                $updateData['estimated_budget'] = (float)$data['estimated_budget'];
+            }
+            if (isset($data['specific_location']) || isset($data['cottage'])) {
+                $updateData['specific_location'] = $data['specific_location'] ?? $data['cottage'];
+            }
+            if (isset($data['additional_notes']) || isset($data['details'])) {
+                $updateData['additional_notes'] = $data['additional_notes'] ?? $data['details'];
+            }
+
+            // Constituent info updates
+            if (isset($data['constituent_name']) || isset($data['reporter_name'])) {
+                $cName = $data['constituent_name'] ?? $data['reporter_name'];
+                $updateData['constituent_name'] = $cName;
+                $updateData['reporter_name'] = $cName;
+            }
+            if (isset($data['constituent_email']) || isset($data['reporter_email'])) {
+                $cEmail = $data['constituent_email'] ?? $data['reporter_email'];
+                $updateData['constituent_email'] = $cEmail;
+                $updateData['reporter_email'] = $cEmail;
+            }
+            if (isset($data['constituent_phone']) || isset($data['constituent_contact']) || isset($data['reporter_phone'])) {
+                $cPhone = $data['constituent_phone'] ?? $data['constituent_contact'] ?? $data['reporter_phone'];
+                $updateData['constituent_contact'] = $cPhone;
+                $updateData['reporter_phone'] = $cPhone;
+            }
+            if (isset($data['constituent_gender']) || isset($data['reporter_gender'])) {
+                $cGender = $data['constituent_gender'] ?? $data['reporter_gender'];
+                $updateData['constituent_gender'] = $cGender;
+                $updateData['reporter_gender'] = $cGender;
+            }
+            if (isset($data['constituent_address']) || isset($data['reporter_address'])) {
+                $cAddress = $data['constituent_address'] ?? $data['reporter_address'];
+                $updateData['constituent_address'] = $cAddress;
+                $updateData['reporter_address'] = $cAddress;
+            }
 
             // Re-resolve sector/subsector if provided
-            if (!empty($data['sector'])) {
+            if (!empty($data['sector_id']) && is_numeric($data['sector_id'])) {
+                $updateData['sector_id'] = (int)$data['sector_id'];
+            } elseif (!empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $updateData['sector_id'] = $sector ? $sector->id : null;
+            }
+            if (!empty($data['sub_sector_id']) && is_numeric($data['sub_sector_id'])) {
+                $updateData['sub_sector_id'] = (int)$data['sub_sector_id'];
+            } elseif (!empty($updateData['sector_id']) && !empty($data['subsector'])) {
+                $subSector = \App\Models\SubSector::where('name', $data['subsector'])
+                    ->where('sector_id', $updateData['sector_id'])
+                    ->first();
+                $updateData['sub_sector_id'] = $subSector ? $subSector->id : null;
+            }
 
-                if ($updateData['sector_id'] && !empty($data['subsector'])) {
-                    $subSector = \App\Models\SubSector::where('name', $data['subsector'])
-                        ->where('sector_id', $updateData['sector_id'])
-                        ->first();
-                    $updateData['sub_sector_id'] = $subSector ? $subSector->id : null;
-                }
+            // Re-resolve location hierarchy IDs if provided
+            if (!empty($data['community_id']) && is_numeric($data['community_id'])) {
+                $updateData['main_community_id'] = (int)$data['community_id'];
+            } elseif (!empty($data['main_community_id']) && is_numeric($data['main_community_id'])) {
+                $updateData['main_community_id'] = (int)$data['main_community_id'];
+            }
+            if (!empty($data['suburb_id']) && is_numeric($data['suburb_id'])) {
+                $updateData['suburb_id'] = (int)$data['suburb_id'];
             }
 
             $report->update($updateData);
@@ -1128,17 +1232,6 @@ class IssueReportController
                 return ResponseHelper::error($response, 'Officer profile not found', 403);
             }
 
-            // Check permissions: Officer can edit if they submitted it OR if they are the assigned officer?
-            // Usually, editing implies correcting the original submission.
-            // Let's restrict to: Officer who submitted it, AND status is 'submitted' or 'rejected'.
-            // Or maybe 'under_officer_review' if they are the one reviewing it and want to fix typos?
-            // For now, let's stick to the plan: Officer who submitted it (or maybe any officer if it's their jurisdiction?)
-            // Safest: Officer who submitted it.
-
-            // Check permissions: Allow any officer to edit if status is appropriate
-            // This allows officers to collaborate or fix issues submitted by others in their jurisdiction.
-
-            // Allow editing in early stages or if under officer review
             if (!in_array($report->status, [IssueReport::STATUS_SUBMITTED, IssueReport::STATUS_REJECTED, IssueReport::STATUS_UNDER_OFFICER_REVIEW])) {
                 return ResponseHelper::error($response, 'Cannot edit issue in current status', 400);
             }
@@ -1162,18 +1255,76 @@ class IssueReportController
             if (!empty($data['priority'])) {
                 $updateData['priority'] = $data['priority'];
             }
+            if (isset($data['issue_type'])) {
+                $updateData['issue_type'] = $data['issue_type'];
+            }
+            if (isset($data['people_affected'])) {
+                $updateData['affected_people_count'] = $data['people_affected'];
+            }
+            if (isset($data['estimated_budget']) && is_numeric($data['estimated_budget'])) {
+                $updateData['estimated_budget'] = (float)$data['estimated_budget'];
+            }
+            if (isset($data['specific_location']) || isset($data['cottage'])) {
+                $updateData['specific_location'] = $data['specific_location'] ?? $data['cottage'];
+            }
+            if (isset($data['additional_notes']) || isset($data['details'])) {
+                $updateData['additional_notes'] = $data['additional_notes'] ?? $data['details'];
+            }
+            if (!empty($data['agent_id'])) {
+                $updateData['assigned_agent_id'] = (int)$data['agent_id'];
+            }
+
+            // Constituent info updates
+            if (isset($data['constituent_name']) || isset($data['reporter_name'])) {
+                $cName = $data['constituent_name'] ?? $data['reporter_name'];
+                $updateData['constituent_name'] = $cName;
+                $updateData['reporter_name'] = $cName;
+            }
+            if (isset($data['constituent_email']) || isset($data['reporter_email'])) {
+                $cEmail = $data['constituent_email'] ?? $data['reporter_email'];
+                $updateData['constituent_email'] = $cEmail;
+                $updateData['reporter_email'] = $cEmail;
+            }
+            if (isset($data['constituent_phone']) || isset($data['constituent_contact']) || isset($data['reporter_phone'])) {
+                $cPhone = $data['constituent_phone'] ?? $data['constituent_contact'] ?? $data['reporter_phone'];
+                $updateData['constituent_contact'] = $cPhone;
+                $updateData['reporter_phone'] = $cPhone;
+            }
+            if (isset($data['constituent_gender']) || isset($data['reporter_gender'])) {
+                $cGender = $data['constituent_gender'] ?? $data['reporter_gender'];
+                $updateData['constituent_gender'] = $cGender;
+                $updateData['reporter_gender'] = $cGender;
+            }
+            if (isset($data['constituent_address']) || isset($data['reporter_address'])) {
+                $cAddress = $data['constituent_address'] ?? $data['reporter_address'];
+                $updateData['constituent_address'] = $cAddress;
+                $updateData['reporter_address'] = $cAddress;
+            }
 
             // Re-resolve sector/subsector if provided
-            if (!empty($data['sector'])) {
+            if (!empty($data['sector_id']) && is_numeric($data['sector_id'])) {
+                $updateData['sector_id'] = (int)$data['sector_id'];
+            } elseif (!empty($data['sector'])) {
                 $sector = \App\Models\Sector::where('name', $data['sector'])->first();
                 $updateData['sector_id'] = $sector ? $sector->id : null;
+            }
+            if (!empty($data['sub_sector_id']) && is_numeric($data['sub_sector_id'])) {
+                $updateData['sub_sector_id'] = (int)$data['sub_sector_id'];
+            } elseif (!empty($updateData['sector_id']) && !empty($data['subsector'])) {
+                $subSector = \App\Models\SubSector::where('name', $data['subsector'])
+                    ->where('sector_id', $updateData['sector_id'])
+                    ->first();
+                $updateData['sub_sector_id'] = $subSector ? $subSector->id : null;
+            }
 
-                if ($updateData['sector_id'] && !empty($data['subsector'])) {
-                    $subSector = \App\Models\SubSector::where('name', $data['subsector'])
-                        ->where('sector_id', $updateData['sector_id'])
-                        ->first();
-                    $updateData['sub_sector_id'] = $subSector ? $subSector->id : null;
-                }
+            // Re-resolve location hierarchy IDs if provided
+            if (!empty($data['community_id']) && is_numeric($data['community_id'])) {
+                $updateData['main_community_id'] = (int)$data['community_id'];
+            } elseif (!empty($data['main_community_id']) && is_numeric($data['main_community_id'])) {
+                $updateData['main_community_id'] = (int)$data['main_community_id'];
+            }
+            if (!empty($data['suburb_id']) && is_numeric($data['suburb_id'])) {
+                $updateData['suburb_id'] = (int)$data['suburb_id'];
             }
 
             $report->update($updateData);
