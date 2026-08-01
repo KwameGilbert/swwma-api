@@ -34,11 +34,13 @@ return function (App $app) {
     // Officer routes (require officer, web_admin, or admin role)
     $app->group('/v1/officer/issues', function ($group) use ($controller) {
         $group->get('', [$controller, 'index']);
+        $group->get('/{id}', [$controller, 'show']);
         $group->post('', [$controller, 'officerSubmit']);
         $group->post('/', [$controller, 'officerSubmit']);
         $group->put('/{id}', [$controller, 'officerUpdate']);
         $group->delete('/{id}', [$controller, 'officerDelete']);
         $group->put('/{id}/forward', [$controller, 'officerForward']);
+        $group->post('/{id}/comments', [$controller, 'addComment']);
     })->add(new RoleMiddleware(['officer', 'web_admin', 'admin']))->add($authMiddleware);
 
     // Admin routes - Viewing & Basic Management (web_admin, admin, officer or task_force)
