@@ -37,6 +37,7 @@ return function (App $app) {
         $group->post('', [$controller, 'officerSubmit']);
         $group->put('/{id}', [$controller, 'officerUpdate']);
         $group->delete('/{id}', [$controller, 'officerDelete']);
+        $group->put('/{id}/status', [$controller, 'updateStatus']);
         $group->put('/{id}/forward', [$controller, 'officerForward']);
         $group->post('/{id}/comments', [$controller, 'addComment']);
     })->add(new RoleMiddleware(['officer', 'web_admin', 'admin']))->add($authMiddleware);

@@ -519,13 +519,19 @@ class IssueReportController
                 $updateData['acknowledged_by'] = $officer->id;
             }
 
+            if ($newStatus === IssueReport::STATUS_FORWARDED_TO_ADMIN && !$report->forwarded_to_admin_at) {
+                $updateData['forwarded_to_admin_at'] = date('Y-m-d H:i:s');
+            }
+
             if ($newStatus === IssueReport::STATUS_RESOLVED && !$report->resolved_at) {
                 $updateData['resolved_at'] = date('Y-m-d H:i:s');
                 $updateData['resolved_by'] = $userId;
-                $updateData['resolution_notes'] = $data['notes'] ?? null;
+                $updateData['resolution_notes'] = $data['notes'] ?? $data['comment'] ?? null;
             }
 
             $report->update($updateData);
+
+            $noteContent = $data['notes'] ?? $data['comment'] ?? null;
 
             // Log status change
             IssueReportStatusHistory::logChange(
@@ -533,11 +539,11 @@ class IssueReportController
                 $userId ?? 0,
                 $oldStatus,
                 $newStatus,
-                $data['notes'] ?? null
+                $noteContent
             );
 
             return ResponseHelper::success($response, 'Status updated successfully', [
-                'report' => $report->fresh()->toArray()
+                'report' => $report->fresh()->toFullArray()
             ]);
         } catch (\Throwable $e) {
             // Return specific error message for debugging
@@ -1637,7 +1643,7 @@ class IssueReportController
                 $user->id ?? 0,
                 $oldStatus,
                 IssueReport::STATUS_FORWARDED_TO_ADMIN,
-                $data['notes'] ?? 'Forwarded to admin by officer'
+                $data['notes'] ?? $data['comment'] ?? 'Forwarded to admin by officer'
             );
 
             return ResponseHelper::success($response, 'Issue forwarded to admin successfully', [
