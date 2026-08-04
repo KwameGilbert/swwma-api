@@ -53,7 +53,7 @@ deployment:
     # Step 6: Run database migrations (optional - uncomment if needed)
     # Make sure your .env is configured on the server first
     # ---------------------------------------------------------------------
-    # - cd $DEPLOYPATH && /usr/local/bin/php vendor/bin/phinx migrate -e production
+    - cd $DEPLOYPATH && /usr/local/bin/php vendor/bin/phinx migrate -e production
 
     # ---------------------------------------------------------------------
     # Step 7: Clear any cached files (if applicable)
