@@ -36,6 +36,7 @@ return function (App $app) {
         $group->get('/{id}', [$controller, 'show']);
         $group->post('', [$controller, 'officerSubmit']);
         $group->put('/{id}', [$controller, 'officerUpdate']);
+        $group->post('/{id}', [$controller, 'officerUpdate']); // For file uploads with _method=PUT
         $group->delete('/{id}', [$controller, 'officerDelete']);
         $group->put('/{id}/status', [$controller, 'updateStatus']);
         $group->put('/{id}/forward', [$controller, 'officerForward']);

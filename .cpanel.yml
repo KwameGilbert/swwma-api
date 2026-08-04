@@ -13,7 +13,7 @@ deployment:
     # Step 1: Navigate to the deployment directory
     # Your deployment path on Namecheap cPanel
     # ---------------------------------------------------------------------
-    - export DEPLOYPATH=/home/kofiwgmr/api.kofibenteh.com
+    - export DEPLOYPATH=/home/kofiwgmr/testapi.kofibenteh.com
 
     # ---------------------------------------------------------------------
     # Step 2: Copy all repository files to deployment directory
@@ -27,7 +27,10 @@ deployment:
     - /bin/cp -R public $DEPLOYPATH/
     - /bin/cp -R src $DEPLOYPATH/
     - /bin/cp -R database $DEPLOYPATH/
-    - /bin/cp -R templates $DEPLOYPATH/
+    # templates/ lives under src/ (src/templates/email, src/templates/sms) and is
+    # copied with src above. Kept tolerant so a missing root templates/ cannot
+    # abort the deploy before the composer step below runs.
+    - /bin/cp -R templates $DEPLOYPATH/ 2>/dev/null || true
     - /bin/cp -R docs $DEPLOYPATH/
 
     # ---------------------------------------------------------------------
